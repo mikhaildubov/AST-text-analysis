@@ -1,0 +1,12 @@
+import "base.proto";           // описание protobuf-типов
+import "facttypes_base.proto"; // описание protobuf-типа NFactType.TFact
+
+message Relation: NFactType.TFact 
+{
+    optional string adj_mod = 1;
+    optional string adj_mod_of = 2;
+    optional string adv = 3;
+    optional string adv_of = 4;
+    optional string subj = 5;
+    optional string subj_of = 6;
+}

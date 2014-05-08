@@ -1,0 +1,11 @@
+encoding "utf8";  //кодировка             
+
+import "base.proto"; //включается всегда          
+import "articles_base.proto"; //включается всегда
+import "facttypes.proto";
+ 
+// статья с основной грамматикой:
+TAuxDicArticle "grammar"
+{
+    key = { "tomita:base.cxx" type=CUSTOM }
+}
