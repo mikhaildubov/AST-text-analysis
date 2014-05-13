@@ -2,20 +2,6 @@
 
 from east import consts
 
-def suffix_comparator(string):
-    def _suffix_comparator(i1, i2):
-        if i1 == len(string):
-            return -1
-        elif i2 == len(string):
-            return 1
-        elif string[i1] < string[i2]:
-            return -1
-        elif string[i1] > string[i2]:
-            return 1
-        else:
-            return _suffix_comparator(i1 + 1, i2 + 1)
-    return _suffix_comparator
-
 
 def index(array, key, start=0):
     # NOTE(msdubov): No boundary check for optimization purposes.

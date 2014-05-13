@@ -124,26 +124,125 @@ class EnhancedAnnotatedSuffixArray(base.AST):
                     suffix_result = (suffix_score + matched_chars - nodes_matched) / matched_chars
                 else:
                     suffix_result = (suffix_score + matched_chars - nodes_matched)
-            result += suffix_result
+                result += suffix_result
             
         result /= len(query)
         return result
 
     def _compute_suftab(self, string):
-        """Naive...
+        """Computes the suffix array of a string in O(n).
 
-        TODO: Implement a O(nlog(n)) or O(n) algorithm to compute this.
-              (Nong, Zhang & Chan (2009) with simultaneous LCP array construction?..)
+        The code is based on that from the pysuffix library (https://code.google.com/p/pysuffix/).
+
+        Kärkkäinen & Sanders (2003).
         """
-        indices = xrange(len(string))
-        suffix_array = sorted(indices, cmp=utils.suffix_comparator(string))
-        suftab = np.int_(suffix_array)
+        n = len(string)
+        string += (unichr(1) * 3)
+        suftab = np.zeros(n, dtype=np.int)
+        alpha = sorted(set(string))
+        self._kark_sort(string, suftab, n, alpha)
         return suftab
 
-    def _compute_lcptab(self, string, suftab):
-        """Computes the LCP array in O(n) based on the input string & its Suffix array.
+    def _kark_sort(self, s, SA, n, alpha):
+        n0 = (n + 2) / 3
+        n1 = (n + 1) / 3
+        n2 = n / 3
+        n02 = n0 + n2
+        # TODO(msdubov): Eliminate pure python list usages (use NumPy arrays only).
+        SA12 = [0] * (n02 + 3)
+        SA0 = [0] * n0 
+        s12 = [i for i in xrange(n + n0 - n1) if i % 3 != 0]
+        s12.extend([0,0,0])
 
-        Kasai et al. (2001)        
+        self._radixpass(s12, SA12, s[2:], n02, alpha)
+        self._radixpass(SA12, s12, s[1:], n02, alpha)
+        self._radixpass(s12, SA12, s, n02, alpha)
+  
+        name = 0
+        c0, c1, c2 = -1, -1, -1
+        array_name = [0]
+        for i in xrange(n02) :
+            if s[SA12[i]] != c0 or s[SA12[i] + 1] != c1 or s[SA12[i] + 2] != c2:
+                name += 1
+                array_name.append(name)
+                c0 = s[SA12[i]]
+                c1 = s[SA12[i]+1]
+                c2 = s[SA12[i]+2]
+            if SA12[i] % 3 == 1:
+                s12[SA12[i] / 3] = name
+            else:
+                s12[SA12[i] / 3 + n0] = name
+
+        if name < n02:
+            self._kark_sort(s12, SA12, n02, array_name)
+            for i in xrange(n02): 
+                s12[SA12[i]] = i+1
+        else:
+            for i in xrange(n02): 
+                SA12[s12[i]-1] = i
+
+        s0 = [SA12[i] * 3 for i in xrange(n02) if SA12[i] < n0]
+
+        self._radixpass(s0, SA0, s, n0, alpha)
+  
+        p = j = k = 0
+        t = n0 - n1
+        while k < n:
+            i = SA12[t] * 3 + 1 if SA12[t] < n0 else (SA12[t] - n0) * 3 + 2
+            j = SA0[p] if p < n0 else 0
+ 
+            if SA12[t] < n0:
+                test = (s12[SA12[t]+n0] <= s12[j/3]) if(s[i]==s[j]) else (s[i] < s[j])
+            elif(s[i]==s[j]) :
+                test = s12[SA12[t]-n0+1] <= s12[j/3 + n0] if(s[i+1]==s[j+1]) else s[i+1] < s[j+1]
+            else:
+                test = s[i] < s[j]
+
+            if(test):
+                SA[k] = i
+                t += 1
+                if t == n02: 
+                    k += 1
+                    l = n0 - p
+                    while p < n0:
+                        SA[k] = SA0[p]
+                        p += 1
+                        k += 1
+          
+            else: 
+                SA[k] = j
+                p += 1
+                if p == n0:
+                    k += 1
+                    while t < n02:
+                        SA[k] = (SA12[t] * 3) + 1 if SA12[t] < n0 else ((SA12[t] - n0) * 3) + 2
+                        t += 1
+                        k += 1
+            k += 1
+
+    def _radixpass(self, a, b, r, n, k) :
+        c = {}
+        for lettre in k :
+            c[lettre] = 0
+
+        for i in xrange(n) :
+            c[r[a[i]]] += 1
+      
+        somme = 0 
+        for lettre in k :
+            freq, c[lettre] = c[lettre], somme
+            somme += freq
+
+        for i in xrange(n) :
+            b[c[r[a[i]]]] = a[i]
+            c[r[a[i]]] += 1
+
+        return b
+
+    def _compute_lcptab(self, string, suftab):
+        """Computes the LCP array in O(n) based on the input string & its suffix array.
+
+        Kasai et al. (2001).
         """
         n = len(suftab)
         rank = np.zeros(n, dtype=np.int)
@@ -164,7 +263,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
     def _compute_childtab(self, lcptab):
         """Computes the child 'up' and 'down' arrays in O(n) based on the LCP table.
 
-        Abouelhoda et al. (2004)
+        Abouelhoda et al. (2004).
         """
         last_index = -1
         stack = [0]
@@ -185,7 +284,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
     def _compute_childtab_next_l_index(self, lcptab):
         """Computes the child 'next l index' array in O(n) based on the LCP table.
 
-        Abouelhoda et al. (2004)
+        Abouelhoda et al. (2004).
         """
         stack = [0]
         n = len(lcptab)
