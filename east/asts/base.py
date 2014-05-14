@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*
 
 import abc
+import inspect
 
 from east import consts
 from east import exceptions
 from east import utils
 
 class AST(object):
-    
+    __metaclass__ = abc.ABCMeta
+
     @staticmethod
     def get_ast(ast_algorithm, strings_collection):
         for ast_cls in utils.itersubclasses(AST):
-            if ast_algorithm == ast_cls.__algorithm__:
+            if not inspect.isabstract(ast_cls) and ast_algorithm == ast_cls.__algorithm__:
                 return ast_cls(strings_collection)
         raise exceptions.NoSuchASTAlgorithm(name=ast_algorithm)
 
