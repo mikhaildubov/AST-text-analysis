@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*
 
 import os
+import random
 import re
 import sys
 
@@ -49,7 +50,6 @@ def text_to_strings_collection(text, words=3):
     text = prepare_text(text)
     strings_collection = tokenize(text)
     strings_collection = filter(lambda s: len(s) > 2 and not s.isdigit(), strings_collection)
-    
         
     i = 0
     strings_collection_grouped = []
@@ -62,6 +62,11 @@ def text_to_strings_collection(text, words=3):
         i += words
         
     return strings_collection_grouped
+
+
+def random_string(length):
+    string = u"".join([unichr(ord("A") + random.randint(0, 25)) for _ in xrange(length - 2)])
+    return string
 
 
 def itersubclasses(cls, _seen=None):
