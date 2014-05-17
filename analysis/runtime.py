@@ -5,16 +5,8 @@ import getopt
 import sys
 import time
 
+from analysis import utils
 from east.asts import base
-from east import utils
-
-
-def worst_case_strings_collection(m, n):
-    # NOTE(msdubov): strings differ only in their last 2 symbols.
-    prefix = utils.random_string(n - 2)
-    strings_collection = [prefix + utils.random_string(n - 2) for _ in xrange(m)]
-    return strings_collection
-
 
 def main(args):
     opts, args = getopt.getopt(args, "")
@@ -31,7 +23,7 @@ def main(args):
         for n in xrange(n_from, n_to + 1, n_step):
             t = 0
             for _ in xrange(repeats):
-                strings_collection = worst_case_strings_collection(m, n)
+                strings_collection = utils.worst_case_strings_collection(m, n)
                 start = time.clock()
                 base.AST.get_ast(ast_algorithm, strings_collection)
                 t += time.clock() - start
