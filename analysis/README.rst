@@ -8,10 +8,9 @@ Runtime analysis
 *python -m analysis.runtime <n_from> <n_to> <n_step> <m>*
 
 - *n_from, n_to, n_step* - Determine the lengths of strings in auto-generated string collections during analysis. These generated collections are "worst-case" ones.
-- *m* - Number of strings in each collections (100 by default)
+- *m* - Number of strings in each collections (100 by default).
 
-The script will compare the performances of all the 3 basic algorithms
-("easa", "ast_linear", "ast_naive")
+The script will compare the performances of all the 3 basic algorithms ("easa", "ast_linear", "ast_naive").
 
 Memory analysis
 ~~~~~~~~~~~~~~~
