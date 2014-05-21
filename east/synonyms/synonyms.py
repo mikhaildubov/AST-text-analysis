@@ -52,11 +52,9 @@ class SynonymExtractor(object):
 
         dependency_triples = []
 
-        cwd = os.getcwd()
-        os.chdir(self.tomita_path)
-
         p = subprocess.Popen([self.tomita_binary, "config.proto"],
-                             stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, cwd=self.tomita_path)
         out, err = p.communicate(input=text)
 
         xmldoc = minidom.parseString(out)
@@ -70,8 +68,6 @@ class SynonymExtractor(object):
                 dependency_triples.append((w2, r[:-3], w1))
             else:
                 dependency_triples.append((w2, r + "_of", w1))
-
-        os.chdir(cwd)
 
         return dependency_triples
 
