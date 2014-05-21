@@ -148,11 +148,10 @@ class EnhancedAnnotatedSuffixArray(base.AST):
         n1 = (n + 1) / 3
         n2 = n / 3
         n02 = n0 + n2
-        # TODO(msdubov): Eliminate pure python list usages (use NumPy arrays only).
+
         SA12 = [0] * (n02 + 3)
-        SA0 = [0] * n0 
-        s12 = [i for i in xrange(n + n0 - n1) if i % 3 != 0]
-        s12.extend([0,0,0])
+        SA0 = [0] * n0
+        s12 = [i for i in xrange(n + n0 - n1) if i % 3 != 0] + [0, 0, 0]
 
         self._radixpass(s12, SA12, s[2:], n02, alpha)
         self._radixpass(SA12, s12, s[1:], n02, alpha)
@@ -161,7 +160,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
         name = 0
         c0, c1, c2 = -1, -1, -1
         array_name = [0]
-        for i in xrange(n02) :
+        for i in xrange(n02):
             if s[SA12[i]] != c0 or s[SA12[i] + 1] != c1 or s[SA12[i] + 2] != c2:
                 name += 1
                 array_name.append(name)
@@ -198,7 +197,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
             else:
                 test = s[i] < s[j]
 
-            if(test):
+            if test:
                 SA[k] = i
                 t += 1
                 if t == n02: 
@@ -207,8 +206,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
                     while p < n0:
                         SA[k] = SA0[p]
                         p += 1
-                        k += 1
-          
+                        k += 1          
             else: 
                 SA[k] = j
                 p += 1
@@ -220,20 +218,18 @@ class EnhancedAnnotatedSuffixArray(base.AST):
                         k += 1
             k += 1
 
-    def _radixpass(self, a, b, r, n, k) :
+    def _radixpass(self, a, b, r, n, alpha):
         c = {}
-        for lettre in k :
-            c[lettre] = 0
-
-        for i in xrange(n) :
+        for letter in alpha:
+            c[letter] = 0
+        for i in xrange(n):
             c[r[a[i]]] += 1
-      
-        somme = 0 
-        for lettre in k :
-            freq, c[lettre] = c[lettre], somme
-            somme += freq
 
-        for i in xrange(n) :
+        total = 0
+        for letter in alpha:
+            freq, c[letter] = c[letter], total
+            total += freq
+        for i in xrange(n):
             b[c[r[a[i]]]] = a[i]
             c[r[a[i]]] += 1
 
@@ -245,7 +241,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
         Kasai et al. (2001).
         """
         n = len(suftab)
-        rank = np.zeros(n, dtype=np.int)
+        rank = [0] * n
         for i in xrange(n):
             rank[suftab[i]] = i
         lcptab = np.zeros(n, dtype=np.int)
@@ -257,7 +253,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
                     h += 1
                 lcptab[rank[i]] = h
                 if h > 0:
-                     h -= 1
+                    h -= 1
         return lcptab
 
     def _compute_childtab(self, lcptab):
