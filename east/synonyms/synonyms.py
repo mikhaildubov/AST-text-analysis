@@ -33,16 +33,12 @@ class SynonymExtractor(object):
         self.synonyms_memoized = {}
 
     def _retrieve_text(self, input_path):
-        j = 0
         if os.path.isdir(input_path):
             text = ""
             for file_name in os.listdir(input_path):
                 if file_name.endswith(".txt"):
-                    if j == 25:
-                        break
                     with open(os.path.abspath(input_path) + "/" + file_name) as f:
                         text += f.read()
-                    j += 1
         else:
             with open(input_path) as f:
                 text = f.read()
