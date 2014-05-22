@@ -132,7 +132,7 @@ class SynonymExtractor(object):
         else:
             return 0.0
 
-    def get_synonyms(self, threshold=0.5, return_similarity_measure=False):
+    def get_synonyms(self, threshold=0.3, return_similarity_measure=False):
         synonyms = collections.defaultdict(list)
         words = filter(lambda w: len(w) > 3 and self.word_frequencies[w] > 3, self.words)
         combs = list(itertools.combinations(words, 2))

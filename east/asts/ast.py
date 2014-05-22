@@ -28,7 +28,7 @@ class AnnotatedSuffixTree(base.AST):
         
         """
         
-        query = query.upper()
+        query = query.replace(" ", "")
         result = 0
     
         # For each suffix of the string:

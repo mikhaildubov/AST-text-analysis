@@ -4,7 +4,7 @@ import getopt
 import os
 import sys
 
-from east.asts import base
+from east import applications
 from east.synonyms import synonyms
 from east import utils
 
@@ -14,32 +14,46 @@ def main(args):
     opts = dict(opts)
     opts.setdefault("-a", "easa")
 
-    input_text_file = os.path.abspath(args[0])
+    input_path = os.path.abspath(args[0])
     keyphrases_file = os.path.abspath(args[1])
     use_synonyms = "-s" in opts
     normalized_scores = "-d" not in opts
     ast_algorithm = opts["-a"]
 
-    with open(input_text_file) as f:
-        text_collection = utils.text_to_strings_collection(f.read())
+    if os.path.isdir(input_path):
+        input_files = [os.path.abspath(input_path) + "/" + file_name
+                       for file_name in os.listdir(input_path)
+                       if file_name.endswith(".txt")]
+    else:
+        input_files = [os.path.abspath(input_path)]
+
+    publications = {}
+    for filename in input_files:
+        with open(filename) as f:
+            publications[os.path.basename(filename)[:-4]] = f.read()
 
     with open(keyphrases_file) as f:
         keyphrases = map(lambda k: utils.prepare_text(k), f.read().splitlines())
 
     if use_synonyms:
-        synonimizer = synonyms.SynonymExtractor(input_text_file)
+        synonimizer = synonyms.SynonymExtractor(input_path)
     else:
         synonimizer = None
 
-    ast = base.AST.get_ast(ast_algorithm, text_collection)
-    scores = {keyphrase: ast.score(keyphrase, normalized=normalized_scores,
-                                   synonimizer=synonimizer)
-              for keyphrase in keyphrases}
+    pk_table = applications.pk_table(publications, keyphrases, ast_algorithm,
+                                     normalized_scores, synonimizer)
 
-    for keyphrase in keyphrases:
-        print "%(keyphrase)s -> %(score).2f" % {"keyphrase": keyphrase,
-                                                "score": scores[keyphrase]}
+    res = u""
+    for publication in sorted(pk_table.keys()):
+        res += '<publication name="%s">\n' % publication
+        for keyphrase in pk_table[publication]:
+            res += '  <keyphrase text="%s">' % keyphrase
+            res += '%.3f' % pk_table[publication][keyphrase]
+            res += '</keyphrase>\n'
+        res += '</publication>\n'
+
+    print res.encode("utf-8")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(sys.argv[1:])

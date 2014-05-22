@@ -13,7 +13,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
 
     def __init__(self, strings_collection):
         self.strings_collection = strings_collection
-        self.string = ''.join(utils.make_unique_endings(strings_collection))
+        self.string = "".join(utils.make_unique_endings(strings_collection))
         self.suftab = self._compute_suftab(self.string)
         self.lcptab = self._compute_lcptab(self.string, self.suftab)
         self.childtab_up, self.childtab_down = self._compute_childtab(self.lcptab)
@@ -26,11 +26,11 @@ class EnhancedAnnotatedSuffixArray(base.AST):
             query_words = common_utils.tokenize(query)
             for i in xrange(len(query_words)):
                 query_words[i] = synonyms[query_words[i]] + [query_words[i]]
-            possible_queries = map(lambda words: ' '.join(words),
+            possible_queries = map(lambda words: "".join(words),
                                    itertools.product(*query_words))
             return max(self._score(q) for q in possible_queries)
         else:
-            return self._score(query, normalized)
+            return self._score(query.replace(" ", ""), normalized)
 
     def traverse_depth_first_pre_order(self, callback):
         """Visits the internal "nodes" of the enhanced suffix array in depth-first pre-order.
