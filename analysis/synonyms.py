@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*
 
 import getopt
+import sys
 
-from east import synonyms
+from east.synonyms import synonyms
 
 def main(args):
     opts, args = getopt.getopt(args, "")
@@ -10,12 +11,12 @@ def main(args):
     path = args[0]
 
     synonimizer = synonyms.SynonymExtractor(path)
-    print "Prepared synonimizer"
+    print "Prepared synonimizer\n"
 
-    synonyms = synonimizer.get_synonyms(threshold=0.3, return_similarity_measure=True)
+    synonym_dicts = synonimizer.get_synonyms(threshold=0.3, return_similarity_measure=True)
     synonym_tuples = []
-    for w1 in synonyms:
-        for w2, sim in synonyms[w1]:
+    for w1 in synonym_dicts:
+        for w2, sim in synonym_dicts[w1]:
             synonym_tuples.append((w1, w2, sim))
     synonym_tuples.sort(key=lambda (w1, w2, sim): -sim)
     for w1, w2, sim in synonym_tuples:

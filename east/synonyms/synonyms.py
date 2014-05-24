@@ -22,7 +22,8 @@ class SynonymExtractor(object):
         if self.tomita_binary is None:
             raise exceptions.TomitaNotInstalledException()
         self.text = self._retrieve_text(input_path)
-        self.dependency_triples = self._retrieve_dependency_triples(self.text)
+        self.dependency_triples, self.dt_for_r, self.dt_for_w1r, self.dt_for_rw2 = \
+            self._retrieve_dependency_triples(self.text)
         self.word_frequencies = self._calculate_word_frequencies(self.text)
         self.frequencies = self._calculate_dt_frequencies(self.dependency_triples)
         self.words = set([dt[0] for dt in self.dependency_triples] +
@@ -48,6 +49,11 @@ class SynonymExtractor(object):
 
         dependency_triples = []
 
+        # Additional indexes to speed up the calculation of I(w1, r, w2)
+        dt_for_r = collections.defaultdict(list)
+        dt_for_w1r = collections.defaultdict(list)
+        dt_for_rw2 = collections.defaultdict(list)
+
         p = subprocess.Popen([self.tomita_binary, "config.proto"],
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE, cwd=self.tomita_path)
@@ -55,17 +61,26 @@ class SynonymExtractor(object):
 
         xmldoc = minidom.parseString(out)
         relations = xmldoc.getElementsByTagName('Relation') 
+        
         for rel in relations:
             r = rel.childNodes[0].nodeName
             w1, w2 = rel.childNodes[0].attributes['val'].value.split(' ', 1)
-            dependency_triples.append((w1, r, w2))
-            # NOTE(msdubov): Also add inversed triples.
-            if r.endswith("_of"):
-                dependency_triples.append((w2, r[:-3], w1))
-            else:
-                dependency_triples.append((w2, r + "_of", w1))
 
-        return dependency_triples
+            dt = (w1, r, w2)
+            dependency_triples.append(dt)
+            dt_for_r[r].append(dt)
+            dt_for_w1r[(w1, r)].append(dt)
+            dt_for_rw2[(r, w2)].append(dt)
+
+            # NOTE(msdubov): Also add inversed triples.
+            r_inv = r[:-3] if r.endswith("_of") else (r + "_of")
+            dt_inv = (w2, r_inv, w1)
+            dependency_triples.append(dt_inv)
+            dt_for_r[r_inv].append(dt_inv)
+            dt_for_w1r[(w2, r_inv)].append(dt_inv)
+            dt_for_rw2[(r_inv, w1)].append(dt_inv)
+
+        return dependency_triples, dt_for_r, dt_for_w1r, dt_for_rw2
 
     def _get_tomita_path(self):
         tomita_path = (os.path.dirname(os.path.abspath(__file__)) +
@@ -101,15 +116,13 @@ class SynonymExtractor(object):
     def I(self, w1, r, w2):
         if (w1, r, w2) in self.I_memoized:
             return self.I_memoized[(w1, r, w2)]
+
         fr_w1rw2 = self.frequencies[w1, r, w2]
         if not fr_w1rw2:
             return 0.0
-        fr__r_ = sum(self.frequencies[triple] for triple in self.frequencies.iterkeys()
-                     if triple[1] == r)
-        fr_w1r_ = sum(self.frequencies[triple] for triple in self.frequencies.iterkeys()
-                      if triple[0] == w1 and triple[1] == r)
-        fr__rw2 = sum(self.frequencies[triple] for triple in self.frequencies.iterkeys()
-                      if triple[1] == r and triple[2] == w2)
+        fr__r_ = sum(self.frequencies[triple] for triple in self.dt_for_r[r])
+        fr_w1r_ = sum(self.frequencies[triple] for triple in self.dt_for_w1r[(w1, r)])
+        fr__rw2 = sum(self.frequencies[triple] for triple in self.dt_for_rw2[(r, w2)])
         res = max(math.log(float(fr_w1rw2) * fr__r_ / fr_w1r_ / fr__rw2), 0.0)
         self.I_memoized[(w1, r, w2)] = res
         return res
@@ -135,7 +148,7 @@ class SynonymExtractor(object):
     def get_synonyms(self, threshold=0.3, return_similarity_measure=False):
         synonyms = collections.defaultdict(list)
         words = filter(lambda w: len(w) > 3 and self.word_frequencies[w] > 3, self.words)
-        combs = list(itertools.combinations(words, 2))
+        combs = itertools.combinations(words, 2)
         for w1, w2 in combs:
             sim = self.similarity(w1, w2)
             if sim > threshold:
