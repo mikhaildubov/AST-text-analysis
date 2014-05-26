@@ -369,10 +369,24 @@ class EnhancedAnnotatedSuffixArray(base.AST):
         return intervals
 
     def _get_child_interval(self, i, j, char):
-        # TODO: optimize not to make it calculate all intervals each time?..
-        interval = filter(lambda interval: interval[3] == char,
-                          self._get_child_intervals(i, j))
-        if interval:
-            return interval[0]
-        else:
+        if i == j:
             return None
+        n = len(self.suftab)
+        l = self._lcp_value(i, j)
+        if i == 0 and j == n - 1:
+            i1 = 0
+        else:
+            if i < self.childtab_up[j + 1]:
+                i1 = self.childtab_up[j + 1]
+            else:
+                i1 = self.childtab_down[i]
+            if self.string[self.suftab[i] + l] == char:
+                return (self._lcp_value(i, i1 - 1), i, i1 - 1, self.string[self.suftab[i] + l])
+        while self.childtab_next_l_index[i1] != 0:
+            i2 = self.childtab_next_l_index[i1]
+            if self.string[self.suftab[i1] + l] == char:
+                return (self._lcp_value(i1, i2 - 1), i1, i2 - 1, self.string[self.suftab[i1] + l])
+            i1 = i2
+        if self.string[self.suftab[i1] + l] == char:
+            return (self._lcp_value(i1, j), i1, j, self.string[self.suftab[i1] + l])
+        return None
