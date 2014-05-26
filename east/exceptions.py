@@ -58,3 +58,7 @@ class TomitaNotInstalledException(EastException):
     msg_fmt = ("Please, add the tomita distribution corresponding to your operating system "
                "to `tools/tomita`. The tomita binary file can be downloaded from %s" %
                consts.URL.TOMITA)
+
+
+class EmptyStringsCollectionException(EastException):
+    msg_fmt = "The input strings collection is empty."

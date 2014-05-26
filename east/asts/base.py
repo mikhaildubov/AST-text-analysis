@@ -17,6 +17,10 @@ class AST(object):
                 return ast_cls(strings_collection)
         raise exceptions.NoSuchASTAlgorithm(name=ast_algorithm)
 
+    def __init__(self, strings_collection):
+        if not strings_collection:
+            raise exceptions.EmptyStringsCollectionException()
+
     @abc.abstractmethod
     def score(self, query, normalized=True, synonimizer=None):
         """Computes the matching score for the given string against the AST."""

@@ -10,6 +10,7 @@ class AnnotatedSuffixTree(base.AST):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, strings_collection):
+        super(AnnotatedSuffixTree, self).__init__(strings_collection)
         self.strings_collection = strings_collection
         self.root = self._construct(strings_collection)
         self._update_node_depth()

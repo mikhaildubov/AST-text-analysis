@@ -12,6 +12,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
     __algorithm__ = "easa"
 
     def __init__(self, strings_collection):
+        super(EnhancedAnnotatedSuffixArray, self).__init__(strings_collection)
         self.strings_collection = strings_collection
         self.string = "".join(utils.make_unique_endings(strings_collection))
         self.suftab = self._compute_suftab(self.string)
@@ -299,7 +300,7 @@ class EnhancedAnnotatedSuffixArray(base.AST):
 
         Based on ideas from Abouelhoda et al. (2004) and Dubov & Chernyak (2013).
         """
-        n = len(suftab)        
+        n = len(suftab)
         anntab = np.zeros(n, dtype=np.int)  # Zeros / -1 ?
 
         def process_node(node):
