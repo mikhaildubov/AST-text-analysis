@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*
 
 import itertools
+import sys
 
 from east.asts import base
 from east import utils
@@ -24,12 +25,32 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
               on the second level.  
     """
 
-    asts = {text: base.AST.get_ast(ast_algorithm, utils.text_to_strings_collection(texts[text]))
-            for text in texts}
+    i = 0
+    total_texts = len(texts)
+    asts = {}
+    for text in texts:
+        i += 1
+        sys.stdout.write("\rConstructing ASTs: %i/%i" % (i, total_texts))
+        sys.stdout.flush()
+        asts[text] = base.AST.get_ast(ast_algorithm, utils.text_to_strings_collection(texts[text]))
 
-    return {keyphrase: {text: asts[text].score(keyphrase, normalized=normalized,
-                                               synonimizer=synonimizer) for text in texts}
-            for keyphrase in keyphrases}
+    i = 0
+    total_keyphrases = len(keyphrases)
+    total_scores = total_texts * total_keyphrases
+    res = {}
+    for keyphrase in keyphrases:
+        res[keyphrase] = {}
+        for text in texts:
+            i += 1
+            sys.stdout.write("\rCalculating matching scores: %i/%i" % (i, total_scores))
+            sys.stdout.flush()
+            res[keyphrase][text] = asts[text].score(keyphrase, normalized=normalized,
+                                                    synonimizer=synonimizer)
+
+    sys.stdout.write("\r")
+    sys.stdout.flush()
+
+    return res
 
 
 def keyphrases_graph(keyphrases, texts, significance_level=0.6, score_treshold=0.2,
