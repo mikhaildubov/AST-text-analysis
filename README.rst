@@ -47,7 +47,7 @@ The *east* software also allows to construct a **keyphrases relation graph**, wh
 
 - The *-s*, *-d* and *-a* options configure the algorithm of computing the matching scores (exactly as for the *keyphrases table* command).
 - The *-l* option stands for *level of significance* and controls the significance level above which the implications between keyphrases are considered to be strong enough to be added as graph arcs. The significance level should be a float in [0; 1] and is 0.6 by default.
-- The *-t* option stands for *threshold of the matching score* and controls the minimum matching score value where keyphrases start to be counted as occuring in the corresponding texts. It should be a float in [0; 1] and is 0.2 by default.
+- The *-t* option stands for *threshold of the matching score* and controls the minimum matching score value where keyphrases start to be counted as occuring in the corresponding texts. It should be a float in [0; 1] and is 0.25 by default.
 
 
 The output is the set of arcs of the graph, which are essentially implications between keyphrases:

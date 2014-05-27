@@ -14,7 +14,7 @@ def main(args):
     opts = dict(opts)
     opts.setdefault("-a", "easa")
     opts.setdefault("-l", "0.6")
-    opts.setdefault("-t", "0.2")
+    opts.setdefault("-t", "0.25")
 
     if len(args) < 2:
         print "Invalid syntax."

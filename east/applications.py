@@ -47,13 +47,13 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
             res[keyphrase][text] = asts[text].score(keyphrase, normalized=normalized,
                                                     synonimizer=synonimizer)
 
-    sys.stdout.write("\r")
+    sys.stdout.write("\r" + " " * 80 + "\r")
     sys.stdout.flush()
 
     return res
 
 
-def keyphrases_graph(keyphrases, texts, significance_level=0.6, score_treshold=0.2,
+def keyphrases_graph(keyphrases, texts, significance_level=0.6, score_treshold=0.25,
                      ast_algorithm="easa", normalized=True, synonimizer=None):
     """
     Constructs the keyphrases relation graph based on the given texts corpus.
@@ -68,7 +68,7 @@ def keyphrases_graph(keyphrases, texts, significance_level=0.6, score_treshold=0
     :param texts: dictionary of form {text_name: text}
     :param significance_level: significance level of the graph in [0; 1], 0.6 by default
     :param score_treshold: threshold for the matching score in [0; 1] where a keyphrase starts
-                           to be considered as occuring in the corresponding text, 0.2 by default
+                           to be considered as occuring in the corresponding text, 0.25 by default
     :param synonimizer: SynonymExtractor object to be used
 
     :returns: graph in a dictionary format: dictionary keys are node labels, while each key points
