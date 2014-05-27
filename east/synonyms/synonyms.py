@@ -21,7 +21,7 @@ class SynonymExtractor(object):
         self.tomita_path, self.tomita_binary = self._get_tomita_path()
         if self.tomita_binary is None:
             raise exceptions.TomitaNotInstalledException()
-        self.text = self._retrieve_text(input_path)
+        self.text, self.number_of_texts = self._retrieve_text(input_path)
         self.dependency_triples, self.dt_for_r, self.dt_for_w1r, self.dt_for_rw2 = \
             self._retrieve_dependency_triples(self.text)
         self.word_frequencies = self._calculate_word_frequencies(self.text)
@@ -36,14 +36,17 @@ class SynonymExtractor(object):
     def _retrieve_text(self, input_path):
         if os.path.isdir(input_path):
             text = ""
+            number_of_texts = 0
             for file_name in os.listdir(input_path):
                 if file_name.endswith(".txt"):
                     with open(os.path.abspath(input_path) + "/" + file_name) as f:
                         text += f.read()
+                        number_of_texts += 1
         else:
             with open(input_path) as f:
                 text = f.read()
-        return text
+                number_of_texts = 1
+        return text, number_of_texts
 
     def _retrieve_dependency_triples(self, text):
 
@@ -147,7 +150,9 @@ class SynonymExtractor(object):
 
     def get_synonyms(self, threshold=0.3, return_similarity_measure=False):
         synonyms = collections.defaultdict(list)
-        words = filter(lambda w: len(w) > 3 and self.word_frequencies[w] > 3, self.words)
+        words = filter(lambda w: len(w) > 2 and
+                                 self.word_frequencies[w] > self.number_of_texts / 50,
+                       self.words)
         combs = itertools.combinations(words, 2)
         for w1, w2 in combs:
             sim = self.similarity(w1, w2)
