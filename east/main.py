@@ -9,7 +9,8 @@ from east.synonyms import synonyms
 from east import utils
 
 
-def main(args):
+def main():
+    args = sys.argv[1:]
     opts, args = getopt.getopt(args, "a:l:t:sd")
     opts = dict(opts)
     opts.setdefault("-a", "easa")
@@ -92,4 +93,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

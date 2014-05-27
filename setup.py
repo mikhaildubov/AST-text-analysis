@@ -3,7 +3,7 @@ import setuptools
 setuptools.setup(
     name = "EAST",
     packages = setuptools.find_packages(),
-    version = "0.1",
+    version = "0.1.1",
     description = "Text analysis library based on the Annotated Suffix Tree method",
 
     install_requires = [
@@ -11,6 +11,12 @@ setuptools.setup(
         "docutils>=0.3",
         "testtools>=0.9.35"
     ],
+
+    entry_points = {
+        "console_scripts": [
+            "east = east.main:main"
+        ]
+    },
 
     author = "Mikhail Dubov",
     author_email = "msdubov@gmail.com",

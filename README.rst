@@ -12,7 +12,7 @@ Keyphrases table
 
 The basic use case for the AST method is to calculate matching scores for a set of keyphrases against a set of text files (the so-called **keyphrase table**). To do that with **east**, launch it as follows:
 
-*python -m east.main [-s] [-d] [-a <ast_algorithm>] keyphrases table <keyphrases_file> <directory_with_txt_files>*
+*$ east [-s] [-d] [-a <ast_algorithm>] keyphrases table <keyphrases_file> <directory_with_txt_files>*
 
 - The *-s* option stands for *synonyms* and determines whether the matching score should be computed taking into account the synonyms extracted from the text file.
 - The *-d* option stands for *denormalized* and specifies whether the the matching score should be computed in the denormalized form (normalized by default, see *[Mirkin, Chernyak & Chugunova, 2012]*.
@@ -43,7 +43,7 @@ Keyphrases graph
 
 The *east* software also allows to construct a **keyphrases relation graph**, which indicates implications between different keyphrases according to the text corpus being analysed. The graph construction algorithm is based on the analysis of co-occurrences of keyphrases in the text corpus. A keyphrase is considered to imply another one if that second phrase occurs frequently enough in the same texts as the first one (that frequency is controlled by the significance level parameter). A keyphrase counts as occuring in a text if its presence score for that text ecxeeds some threshold *[Mirkin, Chernyak, & Chugunova, 2012]*.
 
-*python -m east.main [-s] [-d] [-a <ast_algorithm>] [-l significance_level] [-t score_threshold] keyphrases graph <keyphrases_file> <directory_with_txt_files>*
+*$ east [-s] [-d] [-a <ast_algorithm>] [-l significance_level] [-t score_threshold] keyphrases graph <keyphrases_file> <directory_with_txt_files>*
 
 - The *-s*, *-d* and *-a* options configure the algorithm of computing the matching scores (exactly as for the *keyphrases table* command).
 - The *-l* option stands for *level of significance* and controls the significance level above which the implications between keyphrases are considered to be strong enough to be added as graph arcs. The significance level should be a float in [0; 1] and is 0.6 by default.
