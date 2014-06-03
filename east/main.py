@@ -11,7 +11,7 @@ from east import utils
 
 def main():
     args = sys.argv[1:]
-    opts, args = getopt.getopt(args, "a:l:t:sd")
+    opts, args = getopt.getopt(args, "a:l:t:sdg")
     opts = dict(opts)
     opts.setdefault("-a", "easa")
     opts.setdefault("-l", "0.6")
@@ -75,10 +75,14 @@ def main():
             graph = applications.keyphrases_graph(keyphrases, texts, significance_level,
                                                   score_threshold, ast_algorithm,
                                                   normalized_scores, synonimizer)
-            res = u""
-            for node in graph:
-                if graph[node]:
-                    res += "%s -> %s\n" % (node, ", ".join(graph[node]))
+            print_gml = "-g" in opts
+            if print_gml:
+                res = utils.graph2gml(graph)
+            else:
+                res = u""
+                for node in graph:
+                    if graph[node]:
+                        res += "%s -> %s\n" % (node, ", ".join(graph[node]))
 
             print res.encode("utf-8", "ignore")
 
