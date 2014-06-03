@@ -18,6 +18,7 @@ from east.synonyms import utils
 class SynonymExtractor(object):
 
     def __init__(self, input_path):
+        self.current_os = utils.determine_operating_system()
         self.tomita_path, self.tomita_binary = self._get_tomita_path()
         if self.tomita_binary is None:
             raise exceptions.TomitaNotInstalledException()
@@ -59,7 +60,8 @@ class SynonymExtractor(object):
 
         p = subprocess.Popen([self.tomita_binary, "config.proto"],
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE, cwd=self.tomita_path)
+                             stderr=subprocess.PIPE, cwd=self.tomita_path,
+                             shell=(self.current_os == consts.OperatingSystem.WINDOWS))
         out, err = p.communicate(input=text)
 
         xmldoc = minidom.parseString(out)
@@ -89,14 +91,13 @@ class SynonymExtractor(object):
         tomita_path = (os.path.dirname(os.path.abspath(__file__)) +
                        "/../../tools/tomita/")
 
-        current_os = utils.determine_operating_system()
-        if current_os == consts.OperatingSystem.LINUX_64:
+        if self.current_os == consts.OperatingSystem.LINUX_64:
             tomita_binary = "./tomita-linux64"
-        elif current_os == consts.OperatingSystem.LINUX_32:
+        elif self.current_os == consts.OperatingSystem.LINUX_32:
             tomita_binary = "./tomita-linux32"
-        elif current_os == consts.OperatingSystem.WINDOWS:
-            tomita_binary = "./tomita.exe"
-        elif current_os == consts.OperatingSystem.MACOS:
+        elif self.current_os == consts.OperatingSystem.WINDOWS:
+            tomita_binary = "tomitaparser.exe"
+        elif self.current_os == consts.OperatingSystem.MACOS:
             tomita_binary = "./tomita-mac"
 
         if not os.access(tomita_path + tomita_binary, os.F_OK):
