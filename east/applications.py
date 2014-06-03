@@ -30,8 +30,9 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
     asts = {}
     for text in texts:
         i += 1
-        sys.stdout.write("\rConstructing ASTs: %i/%i" % (i, total_texts))
-        sys.stdout.flush()
+        if not utils.output_is_redirected():
+            sys.stdout.write("\rConstructing ASTs: %i/%i" % (i, total_texts))
+            sys.stdout.flush()
         asts[text] = base.AST.get_ast(ast_algorithm, utils.text_to_strings_collection(texts[text]))
 
     i = 0
@@ -42,13 +43,15 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
         res[keyphrase] = {}
         for text in texts:
             i += 1
-            sys.stdout.write("\rCalculating matching scores: %i/%i" % (i, total_scores))
-            sys.stdout.flush()
+            if not utils.output_is_redirected():
+                sys.stdout.write("\rCalculating matching scores: %i/%i" % (i, total_scores))
+                sys.stdout.flush()
             res[keyphrase][text] = asts[text].score(keyphrase, normalized=normalized,
                                                     synonimizer=synonimizer)
 
-    sys.stdout.write("\r" + " " * 80 + "\r")
-    sys.stdout.flush()
+    if not utils.output_is_redirected():
+        sys.stdout.write("\r" + " " * 80 + "\r")
+        sys.stdout.flush()
 
     return res
 

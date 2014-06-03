@@ -89,6 +89,10 @@ def graph2gml(graph):
     return res
 
 
+def output_is_redirected():
+    return os.fstat(0) != os.fstat(1)
+
+
 def itersubclasses(cls, _seen=None):
     """Generator over all subclasses of a given class in depth first order."""
 
