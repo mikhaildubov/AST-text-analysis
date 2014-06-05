@@ -87,7 +87,6 @@ class EnhancedAnnotatedSuffixArray(base.AST):
         raise NotImplementedError
 
     def _score(self, query, normalized=True):
-        query = query.upper()
         result = 0
         n = len(self.suftab)
 
