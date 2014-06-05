@@ -22,10 +22,10 @@ def main():
         print "Invalid syntax."
         return 1
 
-    command_group = args[0]
-    command = args[1]
+    command = args[0]
+    subcommand = args[1]
 
-    if command_group == "keyphrases":
+    if command == "keyphrases":
 
         keyphrases_file = os.path.abspath(args[2])
         input_path = os.path.abspath(args[3])
@@ -57,7 +57,7 @@ def main():
         else:
             synonimizer = None
 
-        if command == "table":
+        if subcommand == "table":
 
             keyphrases_table = applications.keyphrases_table(keyphrases, texts, ast_algorithm,
                                                              normalized_scores, synonimizer)
@@ -73,7 +73,7 @@ def main():
 
             print res.encode("utf-8", "ignore")
 
-        elif command == "graph":
+        elif subcommand == "graph":
 
             graph = applications.keyphrases_graph(keyphrases, texts, significance_level,
                                                   score_threshold, ast_algorithm,
@@ -93,11 +93,11 @@ def main():
             print res.encode("utf-8", "ignore")
 
         else:
-            print "Invalid command."
+            print "Invalid subcommand: '%s'. Please use one of: 'table', 'graph'." % subcommand
             return 1
 
     else:
-        print "Invalid command."
+        print "Invalid command: '%s'. Please use one of: 'keyphrases'." % command
         return 1
 
 
