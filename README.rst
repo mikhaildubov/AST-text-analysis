@@ -22,6 +22,7 @@ The basic use case for the AST method is to calculate matching scores for a set 
 The output comes in the XML format:
 
 ::
+
     <table>
       <keyphrase value="KEYPHRASE_1">
         <text name="TEXT_1">0.250</text>
@@ -65,6 +66,7 @@ Sample output in the *edges* format:
 The same graph in *gml*:
 
 ::
+
     graph                                                                           
     [
       node
