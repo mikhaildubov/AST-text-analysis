@@ -73,22 +73,6 @@ def random_string(length):
     return string
 
 
-def graph2gml(graph):
-    res = u"graph\n[\n"
-    i = 0
-    node_ids = {}
-    for node in graph:
-        res += '  node\n  [\n    id %i\n    label "%s"\n  ]\n' % (i, node)
-        node_ids[node] = i
-        i += 1
-    for node in graph:
-        for adj_node in graph[node]:
-            res += '  edge\n  [\n    source %i\n    target %i\n  ]\n' % (node_ids[node],
-                                                                         node_ids[adj_node])
-    res += "]\n"
-    return res
-
-
 def output_is_redirected():
     return os.fstat(0) != os.fstat(1)
 
