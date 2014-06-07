@@ -17,8 +17,8 @@ class BASEAstTestCase(testtools.TestCase):
         algorithms = ["easa", "ast_linear", "ast_naive"]
         for normalized in [True, False]:
             for alg1, alg2 in itertools.combinations(algorithms, 2):
-                ast1 = base.AST.get_ast(alg1, self.strings_collection)
-                ast2 = base.AST.get_ast(alg2, self.strings_collection)
+                ast1 = base.AST.get_ast(self.strings_collection, alg1)
+                ast2 = base.AST.get_ast(self.strings_collection, alg2)
                 for query in self.queries:
                     self.assertEqual(ast1.score(query, normalized=normalized),
                                      ast2.score(query, normalized=normalized))

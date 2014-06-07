@@ -25,7 +25,7 @@ def main(args):
             for _ in xrange(repeats):
                 strings_collection = utils.worst_case_strings_collection(m, n)
                 start = time.clock()
-                base.AST.get_ast(ast_algorithm, strings_collection)
+                base.AST.get_ast(strings_collection, ast_algorithm)
                 t += time.clock() - start
             gc.collect()
             print("%i\t%.2f" % (n, t / repeats))

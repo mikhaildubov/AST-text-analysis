@@ -33,7 +33,7 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
         if not utils.output_is_redirected():
             sys.stdout.write("\rConstructing ASTs: %i/%i" % (i, total_texts))
             sys.stdout.flush()
-        asts[text] = base.AST.get_ast(ast_algorithm, utils.text_to_strings_collection(texts[text]))
+        asts[text] = base.AST.get_ast(utils.text_to_strings_collection(texts[text]), ast_algorithm)
 
     i = 0
     total_keyphrases = len(keyphrases)

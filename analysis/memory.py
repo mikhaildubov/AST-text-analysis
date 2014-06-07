@@ -34,7 +34,7 @@ def main(args):
         asts = []
         for _ in xrange(repeats):
             strings_collection = utils.worst_case_strings_collection(m, n)
-            ast = base.AST.get_ast(ast_algorithm, strings_collection)
+            ast = base.AST.get_ast(strings_collection, ast_algorithm)
             asts.append(ast)
         print("%i\t%.2f" % (n, memory_usage() / repeats))
         for ast in asts:
