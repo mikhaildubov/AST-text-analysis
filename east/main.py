@@ -21,13 +21,22 @@ def main():
     #                subcommands and its default value is set in corresponding handlers.
 
     if len(args) < 2:
-        print "Invalid syntax."
+        print("Invalid syntax: EAST should be called as:\n\n"
+              "    east <command> <subcommand> [options] args\n\n"
+              "Commands available: keyphrases.\n"
+              "Subcommands available: table/graph.")
         return 1
 
     command = args[0]
     subcommand = args[1]
 
     if command == "keyphrases":
+
+        if len(args) < 4:
+            print('Invalid syntax. For keyphrases analysis, EAST should be called as:\n\n'
+                  '    east keyphrases <subcommand> [options] "path/to/keyphrases.txt" '
+                  '"path/to/texts/dir"')
+            return 1
 
         keyphrases_file = os.path.abspath(args[2])
         input_path = os.path.abspath(args[3])
