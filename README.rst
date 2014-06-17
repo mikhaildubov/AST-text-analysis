@@ -65,7 +65,7 @@ The *east* software also allows to construct a **keyphrases relation graph**, wh
 *$ east [-s] [-d] [-f <graph_format>] [-l <significance_level>] [-t <score_threshold>] [-a <ast_algorithm>] keyphrases graph <keyphrases_file> <directory_with_txt_files>*
 
 - The *-s*, *-d* and *-a* options configure the algorithm of computing the matching scores (exactly as for the *keyphrases table* command).
-- The *-f* stands for *format* and determines in which format the resulting graph should come to the output. Possible values are:
+- The *-f* option stands for *format* and determines in which format the resulting graph should come to the output. Possible values are:
     - *"GML"* (`Graph Modelling Language <http://en.wikipedia.org/wiki/Graph_Modelling_Language>`_, which can be used for graph visualization in tools like `Gephi <http://gephi.org>`_);
     - *"edges"*, which is just a list of edges in form *Some keyphrase -> <List of keyphrases it points to>* (simple but convenient for a quick analysis of implications between keyphrases).
 - The *-l* option stands for *level of significance* and controls the significance level above which the implications between keyphrases are considered to be strong enough to be added as graph arcs. The significance level should be a float in [0; 1] and is 0.6 by default.
@@ -158,7 +158,7 @@ Working with real texts already requires some preprocessing, such as splitting a
     text_collection = [...]  *# e.g. retrieved from a set of *.txt files*
     strings_collection = itertools.chain.from_iterable(
                             [utils.text_to_strings_collection(text)
-                             for text in texts])
+                             for text in text_collection])
 
     ast = base.AST.get_ast(strings_collection)
 
