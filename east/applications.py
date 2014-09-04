@@ -15,7 +15,7 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
     to the matching score (0 <= score <= 1) of keyphrase "keyphrase"
     in the text named "text".
     
-    :param keyphrases: list of unicode strings
+    :param keyphrases: list of strings
     :param texts: dictionary of form {text_name: text}
     :param ast_algorithm: AST implementation to use
     :param normalized: whether the scores should be normalized
@@ -36,10 +36,13 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
         asts[text] = base.AST.get_ast(utils.text_to_strings_collection(texts[text]), ast_algorithm)
 
     i = 0
+    keyphrases = map(utils.prepare_text, keyphrases)
     total_keyphrases = len(keyphrases)
     total_scores = total_texts * total_keyphrases
     res = {}
     for keyphrase in keyphrases:
+        if not keyphrase:
+            continue
         res[keyphrase] = {}
         for text in texts:
             i += 1
