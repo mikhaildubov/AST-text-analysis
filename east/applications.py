@@ -36,7 +36,8 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
         asts[text] = base.AST.get_ast(utils.text_to_strings_collection(texts[text]), ast_algorithm)
 
     i = 0
-    keyphrases = map(utils.prepare_text, keyphrases)
+    keyphrases_prepared = {keyphrase: utils.prepare_text(keyphrase)
+                           for keyphrase in keyphrases}
     total_keyphrases = len(keyphrases)
     total_scores = total_texts * total_keyphrases
     res = {}
@@ -49,8 +50,8 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
             if not utils.output_is_redirected():
                 sys.stdout.write("\rCalculating matching scores: %i/%i" % (i, total_scores))
                 sys.stdout.flush()
-            res[keyphrase][text] = asts[text].score(keyphrase, normalized=normalized,
-                                                    synonimizer=synonimizer)
+            res[keyphrase][text] = asts[text].score(keyphrases_prepared[keyphrase],
+                                                    normalized=normalized, synonimizer=synonimizer)
 
     if not utils.output_is_redirected():
         sys.stdout.write("\r" + " " * 80 + "\r")
