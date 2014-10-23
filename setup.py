@@ -3,7 +3,7 @@ import setuptools
 setuptools.setup(
     name = "EAST",
     packages = setuptools.find_packages(),
-    version = "0.2.4",
+    version = "0.2.5",
     description = "Text analysis library based on the Annotated Suffix Tree method",
 
     install_requires = [

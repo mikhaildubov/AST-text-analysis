@@ -69,7 +69,7 @@ def text_to_strings_collection(text, words=3):
 
 
 def random_string(length):
-    string = u"".join([unichr(ord("A") + random.randint(0, 25)) for _ in xrange(length - 2)])
+    string = "".join([unichr(ord("A") + random.randint(0, 25)) for _ in xrange(length - 2)])
     return string
 
 

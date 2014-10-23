@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*
 
 def table2xml(keyphrases_table):
-    res = u"<table>\n"
+    res = "<table>\n"
     for keyphrase in sorted(keyphrases_table.keys()):
-        res += u'  <keyphrase value="%s">\n' % keyphrase
+        res += '  <keyphrase value="%s">\n' % keyphrase
         for text in sorted(keyphrases_table[keyphrase].keys()):
-            res += u'    <text name="%s">' % text
-            res += u'%.3f' % keyphrases_table[keyphrase][text]
-            res += u'</text>\n'
-        res += u'  </keyphrase>\n'
-    res += u"</table>\n"
+            res += '    <text name="%s">' % text
+            res += '%.3f' % keyphrases_table[keyphrase][text]
+            res += '</text>\n'
+        res += '  </keyphrase>\n'
+    res += "</table>\n"
     return res
 
 
@@ -20,7 +20,7 @@ def table2csv(keyphrases_table):
 
     keyphrases = sorted(keyphrases_table.keys())
     texts = sorted(keyphrases_table[keyphrases[0]].keys())
-    res = u"," + ",".join(map(quote, keyphrases)) + "\n"  # Heading
+    res = "," + ",".join(map(quote, keyphrases)) + "\n"  # Heading
     for text in texts:
         scores = map(lambda score: u"%.3f" % score,
                      [keyphrases_table[keyphrase][text] for keyphrase in keyphrases])
@@ -29,7 +29,7 @@ def table2csv(keyphrases_table):
 
 
 def graph2edges(graph):
-    res = u""
+    res = ""
     for node in graph:
         if graph[node]:
             res += "%s -> %s\n" % (node, ", ".join(graph[node]))
@@ -37,7 +37,7 @@ def graph2edges(graph):
 
 
 def graph2gml(graph):
-    res = u"graph\n[\n"
+    res = "graph\n[\n"
     i = 0
     node_ids = {}
     for node in graph:
