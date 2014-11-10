@@ -3,7 +3,7 @@ import setuptools
 setuptools.setup(
     name = "EAST",
     packages = setuptools.find_packages(),
-    version = "0.2.7",
+    version = "0.2.8",
     description = "Text analysis library based on the Annotated Suffix Tree method",
 
     install_requires = [
@@ -22,6 +22,6 @@ setuptools.setup(
     author_email = "msdubov@gmail.com",
     license = "MIT",
     url = "https://github.com/msdubov/AST-text-analysis",
-    download_url = "https://github.com/msdubov/AST-text-analysis/tarball/0.2.7",
+    download_url = "https://github.com/msdubov/AST-text-analysis/tarball/0.2.8",
     keywords = ["text analysis", "suffix tree", "synonym extraction"]
 )
