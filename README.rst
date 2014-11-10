@@ -60,16 +60,16 @@ Sample output in the XML format:
 Keyphrases graph
 ~~~~~~~~~~~~~~~~
 
-The *east* software also allows to construct a **keyphrases relation graph**, which indicates implications between different keyphrases according to the text corpus being analysed. The graph construction algorithm is based on the analysis of co-occurrences of keyphrases in the text corpus. A keyphrase is considered to imply another one if that second phrase occurs frequently enough in the same texts as the first one (that frequency is controlled by the significance level parameter). A keyphrase counts as occuring in a text if its presence score for that text ecxeeds some threshold *[Mirkin, Chernyak, & Chugunova, 2012]*.
+The *east* software also allows to construct a **keyphrases relation graph**, which indicates implications between different keyphrases according to the text corpus being analysed. The graph construction algorithm is based on the analysis of co-occurrences of keyphrases in the text corpus. A keyphrase is considered to imply another one if that second phrase occurs frequently enough in the same texts as the first one (that frequency is controlled by the referral confidence parameter). A keyphrase counts as occuring in a text if its presence score for that text ecxeeds some threshold *[Mirkin, Chernyak, & Chugunova, 2012]*.
 
-*$ east [-s] [-d] [-f <graph_format>] [-l <significance_level>] [-t <score_threshold>] [-a <ast_algorithm>] keyphrases graph <keyphrases_file> <directory_with_txt_files>*
+*$ east [-s] [-d] [-f <graph_format>] [-c <referral_confidence>] [-t <relevance_threshold>] [-a <ast_algorithm>] keyphrases graph <keyphrases_file> <directory_with_txt_files>*
 
 - The *-s*, *-d* and *-a* options configure the algorithm of computing the matching scores (exactly as for the *keyphrases table* command).
 - The *-f* option stands for *format* and determines in which format the resulting graph should come to the output. Possible values are:
     - *"GML"* (`Graph Modelling Language <http://en.wikipedia.org/wiki/Graph_Modelling_Language>`_, which can be used for graph visualization in tools like `Gephi <http://gephi.org>`_);
     - *"edges"*, which is just a list of edges in form *Some keyphrase -> <List of keyphrases it points to>* (simple but convenient for a quick analysis of implications between keyphrases).
-- The *-l* option stands for *level of significance* and controls the significance level above which the implications between keyphrases are considered to be strong enough to be added as graph arcs. The significance level should be a float in [0; 1] and is 0.6 by default.
-- The *-t* option stands for *threshold of the matching score* and controls the minimum matching score value where keyphrases start to be counted as occuring in the corresponding texts. It should be a float in [0; 1] and is 0.25 by default.
+- The *-c* option stands for *referral confidence* and controls the confidence level above which the implications between keyphrases are considered to be strong enough to be added as graph arcs. The confidence level should be a float in [0; 1] and is 0.6 by default.
+- The *-t* option stands for *relevance threshold of the matching score* and controls the minimum matching score value where keyphrases start to be counted as occuring in the corresponding texts. It should be a float in [0; 1] and is 0.25 by default.
 
 
 Sample output in the *edges* format:

@@ -30,19 +30,23 @@ def table2csv(keyphrases_table):
 
 def graph2edges(graph):
     res = ""
-    for node in graph:
-        if graph[node]:
-            res += "%s -> %s\n" % (node, ", ".join(graph[node]))
+    node_edges = {}
+    for edge in graph["edges"]:
+        source_label = graph["nodes"][edge["source"]]["label"]
+        target_label = graph["nodes"][edge["target"]]["label"]
+        if source_label not in node_edges:
+            node_edges[source_label] = []
+        node_edges[source_label].append(target_label)
+    for node in node_edges:
+        res += "%s -> %s\n" % (node, ", ".join(node_edges[node]))
     return res
 
 
 def graph2gml(graph):
     res = "graph\n[\n"
     i = 0
-    node_ids = {}
     for i, node in enumerate(graph["nodes"]):
         res += '  node\n  [\n    id %i\n    label "%s"\n  ]\n' % (i, node["label"])
-        node_ids[node["id"]] = i
         i += 1
     for edge in graph["edges"]:
         res += '  edge\n  [\n    source %i\n    target %i\n  ]\n' % (edge["source"],

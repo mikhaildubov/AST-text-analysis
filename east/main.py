@@ -12,11 +12,11 @@ from east import utils
 
 def main():
     args = sys.argv[1:]
-    opts, args = getopt.getopt(args, "a:f:l:t:ds")
+    opts, args = getopt.getopt(args, "a:f:c:r:ds")
     opts = dict(opts)
     opts.setdefault("-a", "easa")   # Algorithm to use for computing ASTs
-    opts.setdefault("-l", "0.6")    # Level of significance for graph construction
-    opts.setdefault("-t", "0.25")   # Threshold of the matching score
+    opts.setdefault("-c", "0.6")    # Referral confidence for graph construction
+    opts.setdefault("-r", "0.25")   # Relevance threshold of the matching score
     # NOTE(msdubov): -f (output format) option takes different values for different
     #                subcommands and its default value is set in corresponding handlers.
 
@@ -43,8 +43,8 @@ def main():
         use_synonyms = "-s" in opts
         normalized_scores = "-d" not in opts
         ast_algorithm = opts["-a"]
-        significance_level = float(opts["-l"])
-        score_threshold = float(opts["-t"])
+        referral_confidence = float(opts["-c"])
+        relevance_threshold = float(opts["-r"])
 
         if os.path.isdir(input_path):
             input_files = [os.path.abspath(input_path) + "/" + filename
@@ -87,8 +87,8 @@ def main():
 
         elif subcommand == "graph":
 
-            graph = applications.keyphrases_graph(keyphrases, texts, significance_level,
-                                                  score_threshold, ast_algorithm,
+            graph = applications.keyphrases_graph(keyphrases, texts, referral_confidence,
+                                                  relevance_threshold, ast_algorithm,
                                                   normalized_scores, synonimizer)
 
             opts.setdefault("-f", "edges")  # Graph output format (also "gml" possible)
