@@ -40,13 +40,12 @@ def graph2gml(graph):
     res = "graph\n[\n"
     i = 0
     node_ids = {}
-    for node in graph:
-        res += '  node\n  [\n    id %i\n    label "%s"\n  ]\n' % (i, node)
-        node_ids[node] = i
+    for i, node in enumerate(graph["nodes"]):
+        res += '  node\n  [\n    id %i\n    label "%s"\n  ]\n' % (i, node["label"])
+        node_ids[node["id"]] = i
         i += 1
-    for node in graph:
-        for adj_node in graph[node]:
-            res += '  edge\n  [\n    source %i\n    target %i\n  ]\n' % (node_ids[node],
-                                                                         node_ids[adj_node])
+    for edge in graph["edges"]:
+        res += '  edge\n  [\n    source %i\n    target %i\n  ]\n' % (edge["source"],
+                                                                     edge["target"])
     res += "]\n"
     return res
