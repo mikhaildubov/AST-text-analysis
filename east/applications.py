@@ -123,7 +123,7 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
     for i1, i2 in itertools.permutations(range(len(graph["nodes"])), 2):
         confidence = (float(len(keyphrase_texts[keyphrases[i1]] &
                                 keyphrase_texts[keyphrases[i2]])) /
-                      max(len(keyphrase_texts[keyphrases[i2]]), 1))
+                      max(len(keyphrase_texts[keyphrases[i1]]), 1))
         if confidence >= referral_confidence:
             graph["edges"].append({
                 "source": i1,
