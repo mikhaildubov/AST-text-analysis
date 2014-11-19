@@ -116,7 +116,7 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
                 "label": keyphrase,
                 "support": len(keyphrase_texts[keyphrase])
             } for i, keyphrase in enumerate(keyphrases)
-              if len(keyphrase_texts[keyphrase]) > support_threshold
+              if len(keyphrase_texts[keyphrase]) >= support_threshold
         ],
         "edges": []
     }
