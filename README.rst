@@ -62,9 +62,10 @@ Keyphrases graph
 
 The *east* software also allows to construct a **keyphrases relation graph**, which indicates implications between different keyphrases according to the text corpus being analysed. The graph construction algorithm is based on the analysis of co-occurrences of keyphrases in the text corpus. A keyphrase is considered to imply another one if that second phrase occurs frequently enough in the same texts as the first one (that frequency is controlled by the referral confidence parameter). A keyphrase counts as occuring in a text if its presence score for that text ecxeeds some threshold *[Mirkin, Chernyak, & Chugunova, 2012]*.
 
-*$ east [-s] [-d] [-f <graph_format>] [-c <referral_confidence>] [-r <relevance_threshold>] [-a <ast_algorithm>] keyphrases graph <keyphrases_file> <directory_with_txt_files>*
+*$ east [-s] [-d] [-f <graph_format>] [-c <referral_confidence>] [-r <relevance_threshold>] [-p <support_threshold>] [-a <ast_algorithm>] keyphrases graph <keyphrases_file> <directory_with_txt_files>*
 
 - The *-s*, *-d* and *-a* options configure the algorithm of computing the matching scores (exactly as for the *keyphrases table* command).
+- The *-p* option configures the threshold for graph node support (the number of documents "containing" the corresponding keyphrase according to the AST method), starting with which the nodes get included into the graph.
 - The *-f* option stands for *format* and determines in which format the resulting graph should come to the output. Possible values are:
     - *"GML"* (`Graph Modelling Language <http://en.wikipedia.org/wiki/Graph_Modelling_Language>`_, which can be used for graph visualization in tools like `Gephi <http://gephi.org>`_);
     - *"edges"*, which is just a list of edges in form *Some keyphrase -> <List of keyphrases it points to>* (simple but convenient for a quick analysis of implications between keyphrases).

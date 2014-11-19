@@ -12,11 +12,12 @@ from east import utils
 
 def main():
     args = sys.argv[1:]
-    opts, args = getopt.getopt(args, "a:f:c:r:ds")
+    opts, args = getopt.getopt(args, "a:f:c:r:p:ds")
     opts = dict(opts)
     opts.setdefault("-a", "easa")   # Algorithm to use for computing ASTs
     opts.setdefault("-c", "0.6")    # Referral confidence for graph construction
     opts.setdefault("-r", "0.25")   # Relevance threshold of the matching score
+    opts.setdefault("-p", "1")      # Support threshold for graph nodes
     # NOTE(msdubov): -f (output format) option takes different values for different
     #                subcommands and its default value is set in corresponding handlers.
 
@@ -45,6 +46,7 @@ def main():
         ast_algorithm = opts["-a"]
         referral_confidence = float(opts["-c"])
         relevance_threshold = float(opts["-r"])
+        support_threshold = float(opts["-p"])
 
         if os.path.isdir(input_path):
             input_files = [os.path.abspath(input_path) + "/" + filename
@@ -88,8 +90,8 @@ def main():
         elif subcommand == "graph":
 
             graph = applications.keyphrases_graph(keyphrases, texts, referral_confidence,
-                                                  relevance_threshold, ast_algorithm,
-                                                  normalized_scores, synonimizer)
+                                                  relevance_threshold, support_threshold,
+                                                  ast_algorithm, normalized_scores, synonimizer)
 
             opts.setdefault("-f", "edges")  # Graph output format (also "gml" possible)
             graph_format = opts["-f"].lower()

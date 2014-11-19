@@ -61,7 +61,7 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
 
 
 def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_threshold=0.25,
-                     ast_algorithm="easa", normalized=True, synonimizer=None):
+                     support_threshold=1, ast_algorithm="easa", normalized=True, synonimizer=None):
     """
     Constructs the keyphrases relation graph based on the given texts corpus.
 
@@ -76,6 +76,8 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
     :param referral_confidence: significance level of the graph in [0; 1], 0.6 by default
     :param relevance_threshold: threshold for the matching score in [0; 1] where a keyphrase starts
                                 to be considered as occuring in the corresponding text, 0.25 by default
+    :param support_threshold: threshold for the support of a node (the number of documents containing
+                              the corresponding keyphrase) such that it can be included into the graph
     :param synonimizer: SynonymExtractor object to be used
 
     :returns: graph dictionary in a the following format:
@@ -114,6 +116,7 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
                 "label": keyphrase,
                 "support": len(keyphrase_texts[keyphrase])
             } for i, keyphrase in enumerate(keyphrases)
+              if len(keyphrase_texts[keyphrase]) > support_threshold
         ],
         "edges": []
     }
@@ -121,9 +124,11 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
     # Creating edges
     # NOTE(msdubov): permutations(), unlike combinations(), treats (1,2) and (2,1) as different
     for i1, i2 in itertools.permutations(range(len(graph["nodes"])), 2):
-        confidence = (float(len(keyphrase_texts[keyphrases[i1]] &
-                                keyphrase_texts[keyphrases[i2]])) /
-                      max(len(keyphrase_texts[keyphrases[i1]]), 1))
+        node1 = graph["nodes"][i1]
+        node2 = graph["nodes"][i2]
+        confidence = (float(len(keyphrase_texts[node1["label"]] &
+                                keyphrase_texts[node2["label"]])) /
+                      max(len(keyphrase_texts[node1["label"]]), 1))
         if confidence >= referral_confidence:
             graph["edges"].append({
                 "source": i1,
