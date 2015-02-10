@@ -113,13 +113,17 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
     graph = {
         "nodes": [
             {
+                "id": i,
                 "label": keyphrase,
                 "support": len(keyphrase_texts[keyphrase])
             } for i, keyphrase in enumerate(keyphrases)
-              if len(keyphrase_texts[keyphrase]) >= support_threshold
         ],
         "edges": []
     }
+
+    # Removing nodes with small support after we've numbered all nodes
+    graph["nodes"] = [n for n in graph["nodes"]
+                      if len(keyphrase_texts[n["label"]]) >= support_threshold]
     
     # Creating edges
     # NOTE(msdubov): permutations(), unlike combinations(), treats (1,2) and (2,1) as different
@@ -131,8 +135,8 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
                       max(len(keyphrase_texts[node1["label"]]), 1))
         if confidence >= referral_confidence:
             graph["edges"].append({
-                "source": i1,
-                "target": i2,
+                "source": node1["id"],
+                "target": node2["id"],
                 "confidence": confidence
             })
             

@@ -45,8 +45,8 @@ def graph2edges(graph):
 def graph2gml(graph):
     res = "graph\n[\n"
     i = 0
-    for i, node in enumerate(graph["nodes"]):
-        res += '  node\n  [\n    id %i\n    label "%s"\n  ]\n' % (i, node["label"])
+    for node in graph["nodes"]:
+        res += '  node\n  [\n    id %i\n    label "%s"\n  ]\n' % (node["id"], node["label"])
         i += 1
     for edge in graph["edges"]:
         res += '  edge\n  [\n    source %i\n    target %i\n  ]\n' % (edge["source"],
