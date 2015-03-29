@@ -48,7 +48,7 @@ def graph2gml(graph):
         res += ('  node\n  [\n    id %i\n    label "%s"\n  ]\n' %
                 (node["id"], node["label"]))
     for edge in graph["edges"]:
-        res += ('  edge\n  [\n    source %i\n    target %i\n    confidence %.2f  ]\n' %
+        res += ('  edge\n  [\n    source %i\n    target %i\n    confidence %.2f\n  ]\n' %
                 (edge["source"], edge["target"], edge["confidence"]))
     res += "]\n"
     return res
