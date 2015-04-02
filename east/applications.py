@@ -118,7 +118,10 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
                 "support": len(keyphrase_texts[keyphrase])
             } for i, keyphrase in enumerate(keyphrases)
         ],
-        "edges": []
+        "edges": [],
+        "referral_confidence": referral_confidence,
+        "relevance_threshold": relevance_threshold,
+        "support_threshold": support_threshold
     }
 
     # Removing nodes with small support after we've numbered all nodes
