@@ -47,7 +47,7 @@ def graph2gml(graph):
     res += "  directed 1\n"
     res += "  referral_confidence %.2f\n" % graph["referral_confidence"]
     res += "  relevance_threshold %.2f\n" % graph["relevance_threshold"]
-    res += "  support_threshold %.2f\n" % graph["support_threshold"]
+    res += "  support_threshold %i\n" % graph["support_threshold"]
     for node in graph["nodes"]:
         res += ('  node\n  [\n    id %i\n    label "%s"\n  ]\n' %
                 (node["id"], node["label"]))
