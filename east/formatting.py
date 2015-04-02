@@ -45,7 +45,7 @@ def graph2edges(graph):
 def graph2gml(graph):
     res = "graph\n[\n"
     res += "  directed 1\n"
-    res += "  referral_confidence %.2f\n" % graph["eferral_confidence"]
+    res += "  referral_confidence %.2f\n" % graph["referral_confidence"]
     res += "  relevance_threshold %.2f\n" % graph["relevance_threshold"]
     res += "  support_threshold %.2f\n" % graph["support_threshold"]
     for node in graph["nodes"]:
