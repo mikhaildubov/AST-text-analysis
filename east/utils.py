@@ -36,7 +36,7 @@ def tokenize(text):
 
 
 def text_to_strings_collection(text, words=3):
-    '''
+    """
     Splits the text to a collection of strings;
     a GAST for such a split collection usually produces
     better results in keyword matching that a GAST
@@ -45,7 +45,7 @@ def text_to_strings_collection(text, words=3):
     consist of (3 by default)
     
     return: Unicode
-    '''
+    """
     
     text = prepare_text(text)
     strings_collection = tokenize(text)

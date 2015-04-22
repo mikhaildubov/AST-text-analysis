@@ -12,10 +12,10 @@ def index(array, key, start=0):
 
 
 def match_strings(str1, str2):
-    '''
+    """
     Returns the largest index i such that str1[:i] == str2[:i]
     
-    '''
+    """
     i = 0
     min_len = len(str1) if len(str1) < len(str2) else len(str2)
     while i < min_len and str1[i] == str2[i]: i += 1
@@ -23,14 +23,14 @@ def match_strings(str1, str2):
 
 
 def make_unique_endings(strings_collection):
-    '''
+    """
     Make each string in the collection end with a unique character.
     Essential for correct builiding of a generalized annotated suffix tree.
     Returns the updated strings collection, encoded in Unicode.
 
     max strings_collection ~ 1.100.000
     
-    '''
+    """
     res = []
     for i in range(len(strings_collection)):
         # NOTE(msdubov): a trick to handle 'narrow' python installation issues.

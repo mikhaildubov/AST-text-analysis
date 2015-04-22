@@ -49,7 +49,7 @@ class AnnotatedSuffixTree(base.AST):
                 suffix_score += child_node.conditional_probability()
                 matched_chars += match
                 suffix = suffix[match:]
-                if suffix and match == substr_end-substr_start:
+                if suffix and match == substr_end - substr_start:
                     child_node = child_node.chose_arc(suffix)
                 else:
                     break
