@@ -15,7 +15,7 @@ class AnnotatedSuffixTree(base.AST):
         self.root = self._construct(strings_collection)
         self._update_node_depth()
 
-    def score(self, query, normalized=True, synonimizer=None):
+    def score(self, query, normalized=True, synonimizer=None, return_suffix_scores=False):
         """
         Matches the string against the GAST using
         the algorithm described in [Chernyak, sections 1.3 & 1.4].
@@ -31,12 +31,14 @@ class AnnotatedSuffixTree(base.AST):
         
         query = query.replace(" ", "")
         result = 0
+        suffix_scores = {}
     
         # For each suffix of the string:
         for suffix_start in xrange(len(query)):
             
             suffix = query[suffix_start:]
             suffix_score = 0
+            suffix_result = 0
             matched_chars = 0
             nodes_matched = 0
             
@@ -55,14 +57,18 @@ class AnnotatedSuffixTree(base.AST):
                     break
             
             if matched_chars:
+                suffix_result = (suffix_score + matched_chars - nodes_matched)
                 if normalized:
-                    suffix_result = (suffix_score + matched_chars - nodes_matched) / matched_chars
-                else:
-                    suffix_result = (suffix_score + matched_chars - nodes_matched)
+                    suffix_result /= matched_chars
                 result += suffix_result
+
+            suffix_scores[query[suffix_start:]] = suffix_result
                     
-            
         result /= len(query)
+
+        if return_suffix_scores:
+            result = result, suffix_scores
+        
         return result
 
     def traverse_depth_first_pre_order(self, callback):

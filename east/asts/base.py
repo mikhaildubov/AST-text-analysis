@@ -22,7 +22,7 @@ class AST(object):
             raise exceptions.EmptyStringsCollectionException()
 
     @abc.abstractmethod
-    def score(self, query, normalized=True, synonimizer=None):
+    def score(self, query, normalized=True, synonimizer=None, return_suffix_scores=False):
         """Computes the matching score for the given string against the AST."""
 
     def traverse(self, callback, order=consts.TraversalOrder.DEPTH_FIRST_PRE_ORDER):        
