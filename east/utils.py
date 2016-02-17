@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*
 
+import itertools
 import os
 import random
 import re
@@ -78,13 +79,18 @@ def text_to_strings_collection(text, words=3):
     return strings_collection_grouped
 
 
+def text_collection_to_string_collection(text_collection, words=3):
+    return flatten([text_to_strings_collection(text) for text in text_collection])
+
+
 def random_string(length):
     string = "".join([unichr(ord("A") + random.randint(0, 25)) for _ in xrange(length - 2)])
     return string
 
 
 def flatten(lst):
-    return [item for sublist in lst for item in sublist]
+    # NOTE(mikhaildubov): This is the fastest implementation according to bit.ly/so_flat_list
+    return list(itertools.chain.from_iterable(lst))
 
 
 def output_is_redirected():

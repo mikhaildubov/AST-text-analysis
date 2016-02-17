@@ -18,7 +18,7 @@ This may require admin permissions on your machine (and should then be run with 
 EAST comes both as a *CLI application* and as a *python library* (which can be imported and used in python code).
 
 
-How to - CLI application
+CLI application
 ------------------------
 
 Keyphrases table
@@ -71,7 +71,7 @@ The *east* software also allows to construct a **keyphrases relation graph**, wh
 
 - The *-p* option configures the threshold for graph node support (the number of documents "containing" the corresponding keyphrase according to the AST method), starting with which the nodes get included into the graph.
 - The *-f* option stands for *format* and determines in which format the resulting graph should come to the output. Possible values are:
-    - *"GML"* (`Graph Modelling Language <http://en.wikipedia.org/wiki/Graph_Modelling_Language>`_, which can be used for graph visualization in tools like `Gephi <http://gephi.org>`_);
+    - *"gml"* (`Graph Modelling Language <http://en.wikipedia.org/wiki/Graph_Modelling_Language>`_, which can be used for graph visualization in tools like `Gephi <http://gephi.org>`_);
     - *"edges"*, which is just a list of edges in form *Keyphrase -> <List of keyphrases it points to>* (simple but convenient for a quick analysis of implications between keyphrases).
 - The *-c* option stands for *referral confidence* and controls the confidence level above which the implications between keyphrases are considered to be strong enough to be added as graph arcs. The confidence level should be a float in [0; 1] and is 0.6 by default.
 - The *-r* option stands for *relevance threshold of the matching score* and controls the minimum matching score value where keyphrases start to be counted as occuring in the corresponding texts. It should be a float in [0; 1] and is 0.25 by default.
@@ -86,7 +86,7 @@ Sample output in the *edges* format:
     KEYPHRASE_2 -> KEYPHRASE_3, KEYPHRASE_4
     KEYPHRASE_4 -> KEYPHRASE_1
 
-The same graph in *GML*:
+The same graph in *gml*:
 
 ::
 
@@ -135,7 +135,7 @@ The same graph in *GML*:
     ]
 
 
-How to - Python library
+Python library
 ------------------------
 
 The example below shows how to use the *EAST* package in code. Here, we build an Annotated suffix tree for a collection of two strings (*"XABXAC"* and *"HI"*) and then calculate matching scores for two queries (*"ABCI"* and *"NOPE"*):
@@ -156,17 +156,19 @@ Working with real texts already requires some preprocessing, such as splitting a
 
 .. parsed-literal::
 
-    import itertools
-
     from east.asts import base
     from east import utils
 
-    text_collection = [...]  *# e.g. retrieved from a set of *.txt files*
-    strings_collection = itertools.chain.from_iterable(
-                            [utils.text_to_strings_collection(text)
-                             for text in text_collection])
+    *# Prepare your text collection (e.g. from a set of *.txt files)*
+    text_collection = [...]
 
+    *# Transform the list of texts into a list of shorter substrings
+    # (this will improve the precision of relevance scores)*
+    strings_collection = text_collection_to_string_collection(text_collection)
+
+    *# Construct an AST for these strings*
     ast = base.AST.get_ast(strings_collection)
 
-    print ast.score("Hello, world")  *# will be in [0; 1]*
-
+    *# Compute the relevance of a keyphrase to the text collection indexed by this AST.
+    # The relevance score will always be in [0; 1]*
+    print ast.score("Hello, world")
