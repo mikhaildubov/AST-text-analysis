@@ -24,7 +24,27 @@ class _String(utils.ImmutableMixin, utils.EnumMixin):
     UNICODE_SPECIAL_SYMBOLS_START = 0x0A00
 
 
+class _ASTAlgorithm(utils.ImmutableMixin, utils.EnumMixin):
+    AST_LINEAR = "ast_linear"
+    AST_NAIVE = "ast_naive"
+    EASA = "easa"
+
+
+class _TermWeighting(utils.ImmutableMixin, utils.EnumMixin):
+    TF = "tf"
+    TF_IDF = "tf-idf"
+
+
+class _VectorSpace(utils.ImmutableMixin, utils.EnumMixin):
+    WORDS = "words"
+    STEMS = "stems"
+    LEMMATA = "lemmata"
+
+
 TraversalOrder = _TraversalOrder()
 OperatingSystem = _OperatingSystem()
 URL = _URL()
 String = _String()
+ASTAlgorithm = _ASTAlgorithm()
+TermWeighting = _TermWeighting()
+VectorSpace = _VectorSpace()

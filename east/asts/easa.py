@@ -5,11 +5,13 @@ import numpy as np
 
 from east.asts import base
 from east.asts import utils
+from east import consts
 from east import utils as common_utils
+
 
 class EnhancedAnnotatedSuffixArray(base.AST):
 
-    __algorithm__ = "easa"
+    __algorithm__ = consts.ASTAlgorithm.EASA
 
     def __init__(self, strings_collection):
         super(EnhancedAnnotatedSuffixArray, self).__init__(strings_collection)

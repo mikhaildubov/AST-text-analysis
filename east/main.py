@@ -5,25 +5,29 @@ import os
 import sys
 
 from east import applications
+from east import consts
 from east import formatting
 from east.synonyms import synonyms
+from east import relevance
 from east import utils
 
 
 def main():
     args = sys.argv[1:]
-    opts, args = getopt.getopt(args, "a:f:c:r:p:ds")
+    opts, args = getopt.getopt(args, "s:a:f:c:r:p:dy")
     opts = dict(opts)
+
+    # Default values for non-boolean options
+    opts.setdefault("-s", "ast")    # Similarity measure to use ("cosine" / "ast")
     opts.setdefault("-a", "easa")   # Algorithm to use for computing ASTs
     opts.setdefault("-c", "0.6")    # Referral confidence for graph construction
     opts.setdefault("-r", "0.25")   # Relevance threshold of the matching score
     opts.setdefault("-p", "1")      # Support threshold for graph nodes
-    # NOTE(msdubov): -f (output format) option takes different values for different
-    #                subcommands and its default value is set in corresponding handlers.
+    # NOTE(mikhaildubov): Default value of '-f' (output format) depends on the subcommand.
 
     if len(args) < 2:
         print("Invalid syntax: EAST should be called as:\n\n"
-              "    east <command> <subcommand> [options] args\n\n"
+              "    east [options] <command> <subcommand> args\n\n"
               "Commands available: keyphrases.\n"
               "Subcommands available: table/graph.")
         return 1
@@ -35,77 +39,82 @@ def main():
 
         if len(args) < 4:
             print('Invalid syntax. For keyphrases analysis, EAST should be called as:\n\n'
-                  '    east keyphrases <subcommand> [options] "path/to/keyphrases.txt" '
+                  '    east [options] keyphrases <subcommand> "path/to/keyphrases.txt" '
                   '"path/to/texts/dir"')
             return 1
 
+        # Keywords
         keyphrases_file = os.path.abspath(args[2])
-        input_path = os.path.abspath(args[3])
-        use_synonyms = "-s" in opts
-        normalized_scores = "-d" not in opts
-        ast_algorithm = opts["-a"]
-        referral_confidence = float(opts["-c"])
-        relevance_threshold = float(opts["-r"])
-        support_threshold = float(opts["-p"])
+        with open(keyphrases_file) as f:
+            keyphrases = map(lambda k: utils.prepare_text(k), f.read().splitlines())
 
-        if os.path.isdir(input_path):
-            input_files = [os.path.abspath(input_path) + "/" + filename
-                           for filename in os.listdir(input_path)
-                           if filename.endswith(".txt")]
+        # Text collection (either a directory or a single file)
+        text_collection_path = os.path.abspath(args[3])
+
+        if os.path.isdir(text_collection_path):
+            text_files = [os.path.abspath(text_collection_path) + "/" + filename
+                          for filename in os.listdir(text_collection_path)
+                          if filename.endswith(".txt")]
         else:
-            input_files = [os.path.abspath(input_path)]
+            # TODO(mikhaildubov): Check that this single file ends with ".txt".
+            text_files = [os.path.abspath(text_collection_path)]
 
         texts = {}
-        for filename in input_files:
+        for filename in text_files:
             with open(filename) as f:
                 text_name = os.path.basename(filename).decode("utf-8")[:-4]
                 texts[text_name] = f.read()
 
-        with open(keyphrases_file) as f:
-            keyphrases = map(lambda k: utils.prepare_text(k), f.read().splitlines())
+        # Similarity measure
+        similarity_measure = opts["-s"]
+        if similarity_measure == "ast":
+            ast_algorithm = opts["-a"]
+            normalized_scores = "-d" not in opts
+            similarity_measure = relevance.ASTRelevanceMeasure(ast_algorithm, normalized_scores)
+        elif similarity_measure == "cosine":
+            # TODO(mikhaildubov): add options fot this measure
+            similarity_measure = relevance.CosineRelevanceMeasure()
 
-        if use_synonyms:
-            synonimizer = synonyms.SynonymExtractor(input_path)
-        else:
-            synonimizer = None
+        # Synomimizer
+        use_synonyms = "-y" in opts
+        synonimizer = synonyms.SynonymExtractor(text_collection_path) if use_synonyms else None
 
         if subcommand == "table":
 
-            keyphrases_table = applications.keyphrases_table(keyphrases, texts, ast_algorithm,
-                                                             normalized_scores, synonimizer)
-            opts.setdefault("-f", "xml")  # Table output format (also "csv" possible)
+            keyphrases_table = applications.keyphrases_table(
+                                    keyphrases, texts, similarity_measure_factory,
+                                    synonimizer)
+
+            opts.setdefault("-f", "xml")  # Table output format ("csv" is the other option)
             table_format = opts["-f"].lower()
 
-            if table_format == "xml":
-                res = formatting.table2xml(keyphrases_table)
-            elif table_format == "csv":
-                res = formatting.table2csv(keyphrases_table)
-            else:
-                print ("Unknown table format: '%s'. "
-                       "Please use one of: 'xml', 'csv'." % table_format)
+            try:
+                res = formatting.format_table(keyphrases_table, table_format)
+                print res.encode("utf-8", "ignore")
+            except Exception as e:
+                print e
                 return 1
-
-            print res.encode("utf-8", "ignore")
 
         elif subcommand == "graph":
 
+            # Graph construction parameters: Referral confidence, relevance and support thresholds            
+            referral_confidence = float(opts["-c"])
+            relevance_threshold = float(opts["-r"])
+            support_threshold = float(opts["-p"])
+
             graph = applications.keyphrases_graph(keyphrases, texts, referral_confidence,
                                                   relevance_threshold, support_threshold,
-                                                  ast_algorithm, normalized_scores, synonimizer)
+                                                  similarity_measure, synonimizer)
 
             opts.setdefault("-f", "edges")  # Graph output format (also "gml" possible)
             graph_format = opts["-f"].lower()
 
-            if graph_format == "gml":
-                res = formatting.graph2gml(graph)
-            elif graph_format == "edges":
-                res = formatting.graph2edges(graph)
-            else:
-                print ("Unknown graph format: '%s'. "
-                       "Please use one of: 'gml', 'edges'." % graph_format)
+            try:
+                res = formatting.format_graph(graph, graph_format)
+                print res.encode("utf-8", "ignore")
+            except Exception as e:
+                print e
                 return 1
-
-            print res.encode("utf-8", "ignore")
 
         else:
             print "Invalid subcommand: '%s'. Please use one of: 'table', 'graph'." % subcommand

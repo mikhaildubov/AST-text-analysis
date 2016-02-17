@@ -4,9 +4,10 @@ from east.asts import ast
 from east.asts import utils
 from east import consts
 
+
 class LinearAnnotatedSuffixTree(ast.AnnotatedSuffixTree):
 
-    __algorithm__ = "ast_linear"
+    __algorithm__ = consts.ASTAlgorithm.AST_LINEAR
 
     def _construct(self, strings_collection):
         """

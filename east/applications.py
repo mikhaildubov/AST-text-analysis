@@ -3,10 +3,10 @@
 import itertools
 import sys
 
-from east.asts import base
+from east import relevance
 from east import utils
 
-def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, synonimizer=None):
+def keyphrases_table(keyphrases, texts, similarity_measure=None, synonimizer=None):
     """
     Constructs the keyphrases table, containing their matching scores in a set of texts.
 
@@ -17,41 +17,37 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
     
     :param keyphrases: list of strings
     :param texts: dictionary of form {text_name: text}
-    :param ast_algorithm: AST implementation to use
-    :param normalized: whether the scores should be normalized
+    :param similarity_measure: similarity measure to use
     :param synonimizer: SynonymExtractor object to be used
 
     :returns: dictionary of dictionaries, having keyphrases on its first level and texts
-              on the second level.  
+              on the second level.
     """
 
-    i = 0
-    total_texts = len(texts)
-    asts = {}
-    for text in texts:
-        i += 1
-        if not utils.output_is_redirected():
-            sys.stdout.write("\rConstructing ASTs: %i/%i" % (i, total_texts))
-            sys.stdout.flush()
-        asts[text] = base.AST.get_ast(utils.text_to_strings_collection(texts[text]), ast_algorithm)
+    similarity_measure = similarity_measure or relevance.ASTRelevanceMeasure()
+
+    text_titles = texts.keys()
+    text_collection = texts.values()
+    similarity_measure.set_text_collection(text_collection)
 
     i = 0
     keyphrases_prepared = {keyphrase: utils.prepare_text(keyphrase)
                            for keyphrase in keyphrases}
     total_keyphrases = len(keyphrases)
-    total_scores = total_texts * total_keyphrases
+    total_scores = len(text_collection) * total_keyphrases
     res = {}
     for keyphrase in keyphrases:
         if not keyphrase:
             continue
         res[keyphrase] = {}
-        for text in texts:
+        for j in xrange(len(text_collection)):
             i += 1
             if not utils.output_is_redirected():
                 sys.stdout.write("\rCalculating matching scores: %i/%i" % (i, total_scores))
                 sys.stdout.flush()
-            res[keyphrase][text] = asts[text].score(keyphrases_prepared[keyphrase],
-                                                    normalized=normalized, synonimizer=synonimizer)
+            res[keyphrase][text_titles[j]] = similarity_measure.relevance(
+                                                        keyphrases_prepared[keyphrase],
+                                                        text=j, synonimizer=synonimizer)
 
     if not utils.output_is_redirected():
         sys.stdout.write("\r" + " " * 80 + "\r")
@@ -61,7 +57,7 @@ def keyphrases_table(keyphrases, texts, ast_algorithm="easa", normalized=True, s
 
 
 def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_threshold=0.25,
-                     support_threshold=1, ast_algorithm="easa", normalized=True, synonimizer=None):
+                     support_threshold=1, similarity_measure=None, synonimizer=None):
     """
     Constructs the keyphrases relation graph based on the given texts corpus.
 
@@ -78,6 +74,7 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
                                 to be considered as occuring in the corresponding text, 0.25 by default
     :param support_threshold: threshold for the support of a node (the number of documents containing
                               the corresponding keyphrase) such that it can be included into the graph
+    :param similarity_measure: Similarity measure to use
     :param synonimizer: SynonymExtractor object to be used
 
     :returns: graph dictionary in a the following format:
@@ -101,8 +98,10 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
                 }
     """
 
+    similarity_measure = similarity_measure or relevance.ASTRelevanceMeasure()
+
     # Keyphrases table
-    table = keyphrases_table(keyphrases, texts, ast_algorithm, normalized, synonimizer)
+    table = keyphrases_table(keyphrases, texts, similarity_measure, synonimizer)
     
     # Dictionary { "keyphrase" => set(names of texts containing "keyphrase") }
     keyphrase_texts = {keyphrase: set([text for text in texts

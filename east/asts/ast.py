@@ -6,6 +6,7 @@ from east.asts import base
 from east.asts import utils
 from east import consts
 
+
 class AnnotatedSuffixTree(base.AST):
     __metaclass__ = abc.ABCMeta
 

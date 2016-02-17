@@ -5,6 +5,8 @@ import random
 import re
 import sys
 
+from nltk.corpus import stopwords as nltk_stopwords
+
 
 class ImmutableMixin(object):
     _inited = False
@@ -33,6 +35,14 @@ def prepare_text(text):
 
 def tokenize(text):
     return re.findall(re.compile("[\w']+", re.U), text)
+
+
+def tokenize_and_filter(text, min_word_length=3, stopwords=None):
+    tokens = tokenize(text)
+    # TODO(mikhaildubov): Add language detection
+    stopwords = stopwords or set(word.upper() for word in nltk_stopwords.words("english"))
+    return [token for token in tokens
+            if len(token) >= min_word_length and token not in stopwords]
 
 
 def text_to_strings_collection(text, words=3):
@@ -71,6 +81,10 @@ def text_to_strings_collection(text, words=3):
 def random_string(length):
     string = "".join([unichr(ord("A") + random.randint(0, 25)) for _ in xrange(length - 2)])
     return string
+
+
+def flatten(lst):
+    return [item for sublist in lst for item in sublist]
 
 
 def output_is_redirected():

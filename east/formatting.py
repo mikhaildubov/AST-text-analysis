@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*
 
+
+def format_table(table, format):
+    if format == "xml":
+        return table2xml(keyphrases_table)
+    elif format == "csv":
+        return table2csv(keyphrases_table)
+    else:
+        raise Exception("Unknown table format: '%s'. "
+                        "Please use one of: 'xml', 'csv'." % format)
+
+
 def table2xml(keyphrases_table):
     res = "<table>\n"
     for keyphrase in sorted(keyphrases_table.keys()):
@@ -28,7 +39,18 @@ def table2csv(keyphrases_table):
     return res
 
 
+def format_graph(graph, format):
+    if format == "gml":
+        return graph2gml(graph)
+    elif format == "edges":
+        return graph2edges(graph)
+    else:
+        raise Exception("Unknown graph format: '%s'. "
+                        "Please use one of: 'gml', 'edges'." % format)
+
+
 def graph2edges(graph):
+    # TODO(mikhaildubov): Exception on the US constitution example!
     res = ""
     node_edges = {}
     for edge in graph["edges"]:
