@@ -14,12 +14,18 @@ from east import utils
 
 def main():
     args = sys.argv[1:]
-    opts, args = getopt.getopt(args, "s:a:f:c:r:p:dy")
+    opts, args = getopt.getopt(args, "s:a:w:v:f:c:r:p:dy")
     opts = dict(opts)
 
     # Default values for non-boolean options
-    opts.setdefault("-s", "ast")    # Similarity measure to use ("cosine" / "ast")
+
+    # Relevance measures
+    opts.setdefault("-s", "ast")    # Similarity measure to use
     opts.setdefault("-a", "easa")   # Algorithm to use for computing ASTs
+    opts.setdefault("-w", "td_idf") # Term weighting used for computing the cosine similarity
+    opts.setdefault("-v", "stems")  # Elements of the vector space for the cosine similarity
+
+    # Graph construction
     opts.setdefault("-c", "0.6")    # Referral confidence for graph construction
     opts.setdefault("-r", "0.25")   # Relevance threshold of the matching score
     opts.setdefault("-p", "1")      # Support threshold for graph nodes
@@ -73,7 +79,9 @@ def main():
             similarity_measure = relevance.ASTRelevanceMeasure(ast_algorithm, normalized_scores)
         elif similarity_measure == "cosine":
             # TODO(mikhaildubov): add options fot this measure
-            similarity_measure = relevance.CosineRelevanceMeasure()
+            term_weighting = opts["-w"]
+            vector_space = opts["-v"]
+            similarity_measure = relevance.CosineRelevanceMeasure(term_weighting, vector_space)
 
         # Synomimizer
         use_synonyms = "-y" in opts
