@@ -78,10 +78,9 @@ def main():
             normalized_scores = "-d" not in opts
             similarity_measure = relevance.ASTRelevanceMeasure(ast_algorithm, normalized_scores)
         elif similarity_measure == "cosine":
-            # TODO(mikhaildubov): add options fot this measure
-            term_weighting = opts["-w"]
             vector_space = opts["-v"]
-            similarity_measure = relevance.CosineRelevanceMeasure(term_weighting, vector_space)
+            term_weighting = opts["-w"]
+            similarity_measure = relevance.CosineRelevanceMeasure(vector_space, term_weighting)
 
         # Synomimizer
         use_synonyms = "-y" in opts
