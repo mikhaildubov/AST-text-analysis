@@ -14,16 +14,22 @@ from east import utils
 
 def main():
     args = sys.argv[1:]
-    opts, args = getopt.getopt(args, "s:a:w:v:f:c:r:p:dy")
+    opts, args = getopt.getopt(args, "s:a:w:v:l:f:c:r:p:dy")
     opts = dict(opts)
 
     # Default values for non-boolean options
+    # Language of the text collection / keyphrases ("english" / "german" / "french" /...)
+    opts.setdefault("-l", consts.Language.ENGLISH)
 
     # Relevance measures
-    opts.setdefault("-s", "ast")    # Similarity measure to use
-    opts.setdefault("-a", "easa")   # Algorithm to use for computing ASTs
-    opts.setdefault("-w", "td_idf") # Term weighting used for computing the cosine similarity
-    opts.setdefault("-v", "stems")  # Elements of the vector space for the cosine similarity
+    # Similarity measure to use ("ast" / "cosine")
+    opts.setdefault("-s", consts.RelevanceMeasure.AST)
+    # Algorithm to use for computing ASTs ("easa" / "ast_linear" / "ast_naive")
+    opts.setdefault("-a", consts.ASTAlgorithm.EASA)
+    # Term weighting scheme used for computing the cosine similarity ("tf-idf" / "tf")
+    opts.setdefault("-w", consts.TermWeighting.TF_IDF)
+    # Elements of the vector space for the cosine similarity ("stems" / "lemmata" / "words")
+    opts.setdefault("-v", consts.VectorSpace.STEMS)
 
     # Graph construction
     opts.setdefault("-c", "0.6")    # Referral confidence for graph construction
@@ -52,7 +58,10 @@ def main():
         # Keywords
         keyphrases_file = os.path.abspath(args[2])
         with open(keyphrases_file) as f:
-            keyphrases = map(lambda k: utils.prepare_text(k), f.read().splitlines())
+            # NOTE(mikhaildubov): utils.prepare_text() should not be called in clients like this
+            #                     one; it is already called in the applications module. Note that
+            #                     the double-calling of this method results in errors.
+            keyphrases = f.read().splitlines()
 
         # Text collection (either a directory or a single file)
         text_collection_path = os.path.abspath(args[3])
@@ -70,6 +79,8 @@ def main():
             with open(filename) as f:
                 text_name = os.path.basename(filename).decode("utf-8")[:-4]
                 texts[text_name] = f.read()
+
+        language = opts["-l"]
 
         # Similarity measure
         similarity_measure = opts["-s"]
@@ -90,14 +101,14 @@ def main():
 
             keyphrases_table = applications.keyphrases_table(
                                     keyphrases, texts, similarity_measure_factory,
-                                    synonimizer)
+                                    synonimizer, language)
 
             opts.setdefault("-f", "xml")  # Table output format ("csv" is the other option)
             table_format = opts["-f"].lower()
 
             try:
                 res = formatting.format_table(keyphrases_table, table_format)
-                print res.encode("utf-8", "ignore")
+                print res
             except Exception as e:
                 print e
                 return 1
@@ -111,14 +122,14 @@ def main():
 
             graph = applications.keyphrases_graph(keyphrases, texts, referral_confidence,
                                                   relevance_threshold, support_threshold,
-                                                  similarity_measure, synonimizer)
+                                                  similarity_measure, synonimizer, language)
 
             opts.setdefault("-f", "edges")  # Graph output format (also "gml" possible)
             graph_format = opts["-f"].lower()
 
             try:
                 res = formatting.format_graph(graph, graph_format)
-                print res.encode("utf-8", "ignore")
+                print res
             except Exception as e:
                 print e
                 return 1

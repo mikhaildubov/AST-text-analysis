@@ -24,6 +24,11 @@ class _String(utils.ImmutableMixin, utils.EnumMixin):
     UNICODE_SPECIAL_SYMBOLS_START = 0x0A00
 
 
+class _RelevanceMeasure(utils.ImmutableMixin, utils.EnumMixin):
+    AST = "AST"
+    COSINE = "cosine"
+
+
 class _ASTAlgorithm(utils.ImmutableMixin, utils.EnumMixin):
     AST_LINEAR = "ast_linear"
     AST_NAIVE = "ast_naive"
@@ -41,10 +46,29 @@ class _VectorSpace(utils.ImmutableMixin, utils.EnumMixin):
     LEMMATA = "lemmata"
 
 
+class _Language(utils.ImmutableMixin, utils.EnumMixin):
+    DANISH = "danish"
+    DUTCH = "dutch"
+    ENGLISH = "english"
+    FINNISH = "finnish"
+    FRENCH = "french"
+    GERMAN = "german"
+    HUNGARIAN = "hungarian"
+    ITALIAN = "italian"
+    NORWEGIAN = "norwegian" 
+    PORTUGUESE = "portuguese"
+    ROMANIAN = "romanian"
+    RUSSIAN = "russian"
+    SPANISH = "spanish"
+    SWEDISH = "swedish"
+
+
 TraversalOrder = _TraversalOrder()
 OperatingSystem = _OperatingSystem()
 URL = _URL()
 String = _String()
+RelevanceMeasure = _RelevanceMeasure()
 ASTAlgorithm = _ASTAlgorithm()
 TermWeighting = _TermWeighting()
 VectorSpace = _VectorSpace()
+Language = _Language()

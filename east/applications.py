@@ -3,10 +3,12 @@
 import itertools
 import sys
 
+from east import consts
 from east import relevance
 from east import utils
 
-def keyphrases_table(keyphrases, texts, similarity_measure=None, synonimizer=None):
+def keyphrases_table(keyphrases, texts, similarity_measure=None, synonimizer=None,
+                     language=consts.Language.ENGLISH):
     """
     Constructs the keyphrases table, containing their matching scores in a set of texts.
 
@@ -19,6 +21,7 @@ def keyphrases_table(keyphrases, texts, similarity_measure=None, synonimizer=Non
     :param texts: dictionary of form {text_name: text}
     :param similarity_measure: similarity measure to use
     :param synonimizer: SynonymExtractor object to be used
+    :param language: Language of the text collection / keyphrases
 
     :returns: dictionary of dictionaries, having keyphrases on its first level and texts
               on the second level.
@@ -28,7 +31,7 @@ def keyphrases_table(keyphrases, texts, similarity_measure=None, synonimizer=Non
 
     text_titles = texts.keys()
     text_collection = texts.values()
-    similarity_measure.set_text_collection(text_collection)
+    similarity_measure.set_text_collection(text_collection, language)
 
     i = 0
     keyphrases_prepared = {keyphrase: utils.prepare_text(keyphrase)
@@ -57,7 +60,8 @@ def keyphrases_table(keyphrases, texts, similarity_measure=None, synonimizer=Non
 
 
 def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_threshold=0.25,
-                     support_threshold=1, similarity_measure=None, synonimizer=None):
+                     support_threshold=1, similarity_measure=None, synonimizer=None,
+                     language=consts.Language.ENGLISH):
     """
     Constructs the keyphrases relation graph based on the given texts corpus.
 
@@ -71,11 +75,14 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
     :param texts: dictionary of form {text_name: text}
     :param referral_confidence: significance level of the graph in [0; 1], 0.6 by default
     :param relevance_threshold: threshold for the matching score in [0; 1] where a keyphrase starts
-                                to be considered as occuring in the corresponding text, 0.25 by default
-    :param support_threshold: threshold for the support of a node (the number of documents containing
-                              the corresponding keyphrase) such that it can be included into the graph
+                                to be considered as occuring in the corresponding text;
+                                the defaul value is 0.25
+    :param support_threshold: threshold for the support of a node (the number of documents
+                              containing the corresponding keyphrase) such that it can be included
+                              into the graph
     :param similarity_measure: Similarity measure to use
     :param synonimizer: SynonymExtractor object to be used
+    :param language: Language of the text collection / keyphrases
 
     :returns: graph dictionary in a the following format:
                 {
@@ -101,7 +108,7 @@ def keyphrases_graph(keyphrases, texts, referral_confidence=0.6, relevance_thres
     similarity_measure = similarity_measure or relevance.ASTRelevanceMeasure()
 
     # Keyphrases table
-    table = keyphrases_table(keyphrases, texts, similarity_measure, synonimizer)
+    table = keyphrases_table(keyphrases, texts, similarity_measure, synonimizer, language)
     
     # Dictionary { "keyphrase" => set(names of texts containing "keyphrase") }
     keyphrase_texts = {keyphrase: set([text for text in texts

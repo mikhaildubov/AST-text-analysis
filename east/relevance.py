@@ -10,7 +10,7 @@ from east import utils
 
 class RelevanceMeasure(object):
 
-    def set_text_collection(self, texts):
+    def set_text_collection(self, texts, language=consts.Language.ENGLISH):
         raise NotImplemented()
 
     def relevance(self, keyphrase, text, synonimizer=None):
@@ -26,8 +26,10 @@ class ASTRelevanceMeasure(RelevanceMeasure):
         self.ast_algorithm = ast_algorithm
         self.normalized = normalized
 
-    def set_text_collection(self, texts):
+    def set_text_collection(self, texts, language=consts.Language.ENGLISH):
         self.texts = texts
+        self.language = language
+        # NOTE(mikhaildubov): utils.text_to_strings_collection() does utils.prepare_text() as well.
         self.asts = [base.AST.get_ast(utils.text_to_strings_collection(text), self.ast_algorithm)
                      for text in texts]
 
@@ -45,7 +47,8 @@ class CosineRelevanceMeasure(RelevanceMeasure):
         self.term_weighting = term_weighting
         
 
-    def set_text_collection(self, texts):
+    def set_text_collection(self, texts, language=consts.Language.ENGLISH):
+        self.language = language
         raw_tokens = [utils.tokenize_and_filter(utils.prepare_text(text)) for text in texts]
         # Convert to stems or lemmata, depending on the vector space type
         preprocessed_tokens = self._preprocess_tokens(raw_tokens)
@@ -59,9 +62,10 @@ class CosineRelevanceMeasure(RelevanceMeasure):
         if self.vector_space == consts.VectorSpace.WORDS:
             return tokens
         if self.vector_space == consts.VectorSpace.STEMS:
-            # TODO(mikhaildubov): Consider using SnowballStemmer + auto language detection
-            from nltk.stem import porter
-            stemmer = porter.PorterStemmer()
+            # TODO(mikhaildubov): If the user does not specify the language, can we do some
+            #                     auto language detection here?
+            from nltk.stem import snowball
+            stemmer = snowball.SnowballStemmer(self.language)
             return [[stemmer.stem(token) for token in tokens[i]] for i in xrange(len(tokens))]
         elif self.vector_space == consts.VectorSpace.LEMMATA:
             # TODO(mikhaildubov): Implement this (what lemmatizer to use here?)
@@ -109,8 +113,7 @@ class CosineRelevanceMeasure(RelevanceMeasure):
         import numpy as np
 
         # TF-IDF for query tokens
-        query_tokens = self._preprocess_tokens(
-                                        [utils.tokenize_and_filter(utils.prepare_text(keyphrase))])
+        query_tokens = self._preprocess_tokens([utils.tokenize_and_filter(keyphrase)])
         query_tf, query_idf = self._tf_idf(query_tokens)
         query_tf = query_tf[0]
 
