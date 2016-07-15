@@ -3,6 +3,8 @@
 from collections import defaultdict
 import math
 
+import numpy as np
+
 from east.asts import base
 from east import consts
 from east import utils
@@ -99,8 +101,6 @@ class CosineRelevanceMeasure(RelevanceMeasure):
 
 
     def _cosine_similarity(self, u, v):
-        import numpy as np
-
         u_norm = math.sqrt(np.dot(u, u)) if np.count_nonzero(u) else 1.0
         v_norm = math.sqrt(np.dot(v, v)) if np.count_nonzero(v) else 1.0
         return np.dot(u, v) / (u_norm * v_norm)
@@ -110,7 +110,6 @@ class CosineRelevanceMeasure(RelevanceMeasure):
         # Based on: https://janav.wordpress.com/2013/10/27/tf-idf-and-cosine-similarity/,
         # but query vectors are defined here in the same vector space as document vectors
         # (not in the reduced one as in the article).
-        import numpy as np
 
         # TF-IDF for query tokens
         query_tokens = self._preprocess_tokens([utils.tokenize_and_filter(keyphrase)])

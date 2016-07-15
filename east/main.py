@@ -75,10 +75,18 @@ def main():
             text_files = [os.path.abspath(text_collection_path)]
 
         texts = {}
-        for filename in text_files:
-            with open(filename) as f:
-                text_name = os.path.basename(filename).decode("utf-8")[:-4]
-                texts[text_name] = f.read()
+        # NOTE(mikhaildubov): If we have only one text file, we should split the lines.
+        if len(text_files) == 1:
+            with open(text_files[0]) as f:
+                lines = f.read().splitlines()
+                for i in xrange(len(lines)):
+                    texts[str(i)] = lines[i]
+        # NOTE(mikhaildubov): If there are multiple text files, read them one-by-one.
+        else:
+            for filename in text_files:
+                with open(filename) as f:
+                    text_name = os.path.basename(filename).decode("utf-8")[:-4]
+                    texts[text_name] = f.read()
 
         language = opts["-l"]
 
