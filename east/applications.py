@@ -4,6 +4,7 @@ import itertools
 import sys
 
 from east import consts
+from east import logging
 from east import relevance
 from east import utils
 
@@ -45,16 +46,12 @@ def keyphrases_table(keyphrases, texts, similarity_measure=None, synonimizer=Non
         res[keyphrase] = {}
         for j in xrange(len(text_collection)):
             i += 1
-            if not utils.output_is_redirected():
-                sys.stdout.write("\rCalculating matching scores: %i/%i" % (i, total_scores))
-                sys.stdout.flush()
+            logging.progress("Calculating matching scores: %i/%i", i, total_scores)
             res[keyphrase][text_titles[j]] = similarity_measure.relevance(
                                                         keyphrases_prepared[keyphrase],
                                                         text=j, synonimizer=synonimizer)
 
-    if not utils.output_is_redirected():
-        sys.stdout.write("\r" + " " * 80 + "\r")
-        sys.stdout.flush()
+    logging.clear()
 
     return res
 
