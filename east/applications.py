@@ -46,7 +46,7 @@ def keyphrases_table(keyphrases, texts, similarity_measure=None, synonimizer=Non
         res[keyphrase] = {}
         for j in xrange(len(text_collection)):
             i += 1
-            logging.progress("Calculating matching scores: %i/%i", i, total_scores)
+            logging.progress("Calculating matching scores", i, total_scores)
             res[keyphrase][text_titles[j]] = similarity_measure.relevance(
                                                         keyphrases_prepared[keyphrase],
                                                         text=j, synonimizer=synonimizer)

@@ -5,9 +5,9 @@ import sys
 from east import utils
 
 
-def progress(message, *args):
+def progress(message, step, total):
     if not utils.output_is_redirected():
-        sys.stdout.write("\r%s" % (message % args))
+        sys.stdout.write("\r%s: %i/%i" % (message, step, total))
         sys.stdout.flush()
 
 

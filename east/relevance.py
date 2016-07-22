@@ -44,7 +44,7 @@ class ASTRelevanceMeasure(RelevanceMeasure):
             self.asts.append(base.AST.get_ast(
                                     utils.text_to_strings_collection(texts[i]),
                                     self.ast_algorithm))
-            logging.progress("Indexing texts with ASTs: %i/%i", i + 1, total_texts)
+            logging.progress("Indexing texts with ASTs", i + 1, total_texts)
 
         logging.clear()
 
@@ -70,7 +70,7 @@ class CosineRelevanceMeasure(RelevanceMeasure):
         total_texts = len(texts)
         for i in xrange(total_texts):
             raw_tokens.append(utils.tokenize_and_filter(utils.prepare_text(texts[i])))
-            logging.progress("Preparing texts: %i/%i", i + 1, total_texts)
+            logging.progress("Preparing texts", i + 1, total_texts)
 
         logging.clear()
 
@@ -93,7 +93,7 @@ class CosineRelevanceMeasure(RelevanceMeasure):
             total_texts = len(tokens_in_texts)
             for i in xrange(total_texts):
                 stemmed_tokens.append([self.stemmer.stem(token) for token in tokens_in_texts[i]])
-                logging.progress("Stemming tokens in texts: %i/%i", i + 1, total_texts)
+                logging.progress("Stemming tokens in texts", i + 1, total_texts)
             return stemmed_tokens
         elif self.vector_space == consts.VectorSpace.LEMMATA:
             # TODO(mikhaildubov): Implement this (what lemmatizer to use here?)
@@ -116,7 +116,7 @@ class CosineRelevanceMeasure(RelevanceMeasure):
         tf = [np.zeros(terms_count) for _ in xrange(total_texts)]
         idf_per_ferm = defaultdict(int)
         for i in xrange(total_texts):
-            logging.progress("Processing texts for TF-IDF: %i/%i", i + 1, total_texts)
+            logging.progress("Processing texts for TF-IDF", i + 1, total_texts)
             # NOTE(mikhaildubov): For TF, we want to count each term as many time as it appears
             for term in tokens_in_texts[i]:
                 if term in term_index:
