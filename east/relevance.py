@@ -122,15 +122,19 @@ class CosineRelevanceMeasure(RelevanceMeasure):
                 if term in term_index:
                     tf[i][term_index[term]] += 1
             # NOTE(mikhaildubov): For IDF, we want to count each document once for each term
-            for term in set(tokens_in_texts[i]):
-                if term in term_index:
-                    idf_per_ferm[term] += 1
+            if self.term_weighting == consts.TermWeighting.TF_IDF:
+                for term in set(tokens_in_texts[i]):
+                    if term in term_index:
+                        idf_per_ferm[term] += 1
             # TF Normalization
             tf[i] = [freq * 1.0 / max(len(tokens_in_texts[i]), 1) for freq in tf[i]]
         # Actual IDF metric calculation
-        idf = np.zeros(len(self.terms))
-        for term in idf_per_ferm:
-            idf[term_index[term]] = 1 + math.log(total_texts * 1.0 / idf_per_ferm[term])
+        if self.term_weighting == consts.TermWeighting.TF_IDF:
+            idf = np.zeros(len(self.terms))
+            for term in idf_per_ferm:
+                idf[term_index[term]] = 1 + math.log(total_texts * 1.0 / idf_per_ferm[term])
+        else:
+            idf = None
 
         logging.clear()
 
